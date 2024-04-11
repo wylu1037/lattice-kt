@@ -2,4 +2,8 @@ description = "crypto"
 
 dependencies {
     implementation project(path: ':model')
+    implementation(
+            "org.bouncycastle:bcprov-jdk15to18",
+            "com.github.komputing.khex:core-jvm",
+    )
 }

@@ -17,6 +17,7 @@ allprojects {
 ext {
     komputing_khash_version = '1.1.1'
     komputing_khex_version = '1.1.2'
+    bc_version = '1.72'
 }
 
 subprojects {
@@ -34,6 +35,8 @@ subprojects {
             dependency "com.github.komputing:khex:${komputing_khex_version}"
             dependency "com.github.komputing.khex:core-jvm:${komputing_khex_version}"
             dependency "com.github.komputing.khex:extensions-jvm:${komputing_khex_version}"
+
+            dependency "org.bouncycastle:bcprov-jdk15to18:${bc_version}"
         }
     }
 

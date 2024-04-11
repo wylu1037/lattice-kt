@@ -2,4 +2,8 @@ description = 'model'
 
 dependencies {
     implementation("com.github.komputing.khex:extensions-jvm")
+    implementation(
+            "org.bouncycastle:bcprov-jdk15to18",
+            "com.github.komputing.khash:sha256-jvm",
+    )
 }
