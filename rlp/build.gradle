@@ -1,0 +1,8 @@
+description = 'rlp'
+
+dependencies {
+    implementation project(path: ':model')
+    implementation(
+            "com.github.komputing.khex:extensions-jvm",
+    )
+}
