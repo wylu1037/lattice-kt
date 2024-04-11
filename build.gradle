@@ -1,12 +1,45 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.23'
+    id 'io.spring.dependency-management' version "1.1.4"
 }
 
 group = 'com.example'
 version = '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+ext {
+    komputing_khash_version = '1.1.1'
+    komputing_khex_version = '1.1.2'
+}
+
+subprojects {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        dependencies {
+            dependency "com.github.komputing:khash:${komputing_khash_version}"
+            dependency "com.github.komputing.khash:keccak-jvm:${komputing_khash_version}"
+            dependency "com.github.komputing.khash:ripemd160-jvm:${komputing_khash_version}"
+            dependency "com.github.komputing.khash:sha256-jvm:${komputing_khash_version}"
+            dependency "com.github.komputing.khash:sha512-jvm:${komputing_khash_version}"
+
+            dependency "com.github.komputing:khex:${komputing_khex_version}"
+            dependency "com.github.komputing.khex:core-jvm:${komputing_khex_version}"
+            dependency "com.github.komputing.khex:extensions-jvm:${komputing_khex_version}"
+        }
+    }
+
+    dependencies {
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    }
 }
 
 dependencies {
@@ -15,8 +48,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(11)
 }

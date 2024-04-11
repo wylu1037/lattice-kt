@@ -1,0 +1,5 @@
+description = "crypto"
+
+dependencies {
+    implementation project(path: ':model')
+}
