@@ -1,6 +1,8 @@
 package com.example.model
 
+import com.example.model.extension.hexToBigInteger
 import com.example.model.extension.toBigInteger
+import org.komputing.khex.model.HexString
 import java.math.BigInteger
 
 /**
@@ -10,7 +12,7 @@ import java.math.BigInteger
  */
 data class PrivateKey(val key: BigInteger) {
     constructor(privateKey: ByteArray): this(privateKey.toBigInteger())
-    constructor(privateKeyHexString: String): this(privateKeyHexString.toBigInteger())
+    constructor(privateKeyHex: HexString): this(privateKeyHex.hexToBigInteger())
 }
 
 data class PublicKey(val key: BigInteger) {
