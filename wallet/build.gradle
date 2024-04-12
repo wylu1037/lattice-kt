@@ -1,0 +1,9 @@
+description = 'wallet'
+
+dependencies {
+    implementation project(path: ':model')
+    implementation project(path: ':crypto')
+    implementation(
+            "com.github.komputing.khex:extensions-jvm"
+    )
+}

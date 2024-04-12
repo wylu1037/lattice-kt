@@ -3,9 +3,8 @@ package com.example.rlp
 import com.example.model.extension.toMinimalByteArray
 
 /**
-RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
+ * RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
  */
-
 fun RLPType.encode(): ByteArray = when (this) {
     is RLPElement -> bytes.encodeLegacyTxRLP(ELEMENT_OFFSET)
     is RLPList -> element.asSequence().map { it.encode() }

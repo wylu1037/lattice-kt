@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.23'
     id 'io.spring.dependency-management' version "1.1.4"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
 }
 
 group = 'com.example'
@@ -18,11 +19,13 @@ ext {
     komputing_khash_version = '1.1.1'
     komputing_khex_version = '1.1.2'
     bc_version = '1.72'
+    kotlin_json_version = '1.6.0'
 }
 
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
     dependencyManagement {
         dependencies {
@@ -37,11 +40,14 @@ subprojects {
             dependency "com.github.komputing.khex:extensions-jvm:${komputing_khex_version}"
 
             dependency "org.bouncycastle:bcprov-jdk15to18:${bc_version}"
+
+            dependency "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlin_json_version}"
         }
     }
 
     dependencies {
-        testImplementation 'org.jetbrains.kotlin:kotlin-test'
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+        testImplementation "org.jetbrains.kotlin:kotlin-test"
     }
 }
 

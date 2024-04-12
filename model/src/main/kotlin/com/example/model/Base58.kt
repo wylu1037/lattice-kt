@@ -1,4 +1,4 @@
-package com.example.crypto.impl
+package com.example.model
 
 import org.komputing.khash.sha256.extensions.sha256
 import org.komputing.khex.extensions.hexToByteArray

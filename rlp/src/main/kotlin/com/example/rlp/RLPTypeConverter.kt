@@ -8,11 +8,8 @@ import java.math.BigInteger
 import java.math.BigInteger.ZERO
 
 /**
-RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
+ * RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
  */
-
-// to RLP
-
 fun String.toRLP() = if (this.startsWith("0x")) {
     val str = this.substring(2)
     if (str.isEmpty()) {
@@ -46,7 +43,6 @@ fun Array<*>.toRLP(): RLPList {
 }
 
 // from RLP
-
 fun RLPElement.toIntFromRLP() = if (bytes.isEmpty()) {
     0
 } else {

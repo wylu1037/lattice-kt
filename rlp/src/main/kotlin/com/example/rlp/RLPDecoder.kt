@@ -3,9 +3,8 @@ package com.example.rlp
 import java.math.BigInteger
 
 /**
-RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
+ * RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
  */
-
 fun ByteArray.decodeRLP() = decodeRLPWithSize().element
 
 private data class DecodeResult(val element: RLPType, val size: Int)

@@ -1,9 +1,8 @@
 package com.example.rlp
 
 /**
-RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
+ * RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
  */
-
 internal const val ELEMENT_OFFSET = 128
 internal const val LIST_OFFSET = 192
 
