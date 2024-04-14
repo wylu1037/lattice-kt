@@ -14,3 +14,12 @@ fun ByteArray.removeLeadingZero(): ByteArray {
     while (start < size && this[start] == 0.toByte()) start++
     return this.copyOfRange(start, size)
 }
+
+fun ByteArray.toBitArray(): BooleanArray {
+    val bits = BooleanArray(this.size * 8)
+    for (byteIndex in this.indices)
+        for (bitIndex in 0..7) {
+            bits[byteIndex * 8 + bitIndex] = (1 shl (7 - bitIndex)) and this[byteIndex].toInt() != 0
+        }
+    return bits
+}

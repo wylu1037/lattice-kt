@@ -7,4 +7,5 @@ include 'crypto'
 include 'rlp'
 include 'wallet'
 include 'lattice'
+include 'mnemonic'
 

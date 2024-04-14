@@ -20,6 +20,7 @@ ext {
     komputing_khex_version = '1.1.2'
     bc_version = '1.72'
     kotlin_json_version = '1.6.0'
+    kbip44_version = '0.5'
 }
 
 subprojects {
@@ -42,6 +43,7 @@ subprojects {
             dependency "org.bouncycastle:bcprov-jdk15to18:${bc_version}"
 
             dependency "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlin_json_version}"
+            dependency "com.github.komputing:kbip44:${kbip44_version}"
         }
     }
 

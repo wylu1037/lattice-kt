@@ -1,5 +1,6 @@
 package com.example.crypto.api.ec
 
+import com.example.model.PublicKey
 import java.math.BigInteger
 
 /**
@@ -35,4 +36,8 @@ interface CurvePoint {
      * 从而节省存储空间。非压缩格式则通常包含 x 和 y 坐标两个大整数的信息。
      */
     fun encoded(compressed: Boolean = false): ByteArray
+}
+
+fun CurvePoint.toPublicKey() = encoded().let {
+    PublicKey(BigInteger(1, it.copyOfRange(1, it.size)))
 }
