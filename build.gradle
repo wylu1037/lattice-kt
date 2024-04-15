@@ -21,6 +21,7 @@ ext {
     bc_version = '1.72'
     kotlin_json_version = '1.6.0'
     kbip44_version = '0.5'
+    web3j_version = "4.9.8"
 }
 
 subprojects {
@@ -44,6 +45,10 @@ subprojects {
 
             dependency "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlin_json_version}"
             dependency "com.github.komputing:kbip44:${kbip44_version}"
+
+            dependency "org.web3j:core:${web3j_version}"
+            dependency "org.web3j:utils:${web3j_version}"
+            dependency "org.web3j:abi:${web3j_version}"
         }
     }
 

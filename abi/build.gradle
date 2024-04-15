@@ -1,0 +1,9 @@
+description = 'abi'
+
+dependencies {
+    implementation(
+            "org.web3j:core",
+            "org.web3j:utils",
+            "org.web3j:abi",
+    )
+}
