@@ -18,8 +18,8 @@ import org.bouncycastle.math.ec.FixedPointCombMultiplier
 import org.bouncycastle.math.ec.custom.gm.SM2P256V1Curve
 import org.bouncycastle.math.ec.custom.sec.SecP256K1Curve
 import org.bouncycastle.util.Arrays
-import java.math.BigInteger
 import org.komputing.khex.decode
+import java.math.BigInteger
 
 class EllipticCurveSigner(private val curveName: String) : Signer {
     private val curveParams = getCurveParams(curveName)

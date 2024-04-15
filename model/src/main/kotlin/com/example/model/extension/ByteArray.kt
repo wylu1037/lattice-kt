@@ -1,5 +1,7 @@
 package com.example.model.extension
 
+import org.bouncycastle.util.encoders.Hex
+
 fun ByteArray.toFixedLengthByteArray(fixedSize: Int, fillByte: Byte = 0) = if (size == fixedSize) {
     this
 } else {
@@ -23,3 +25,5 @@ fun ByteArray.toBitArray(): BooleanArray {
         }
     return bits
 }
+
+fun ByteArray.toHexString() = "0x" + Hex.toHexString(this)

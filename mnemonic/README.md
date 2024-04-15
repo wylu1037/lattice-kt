@@ -44,3 +44,10 @@ m / purpose' / coin_type' / account' / change / address_index
 + `address_index` 是同一层级内生成的地址索引。
 
 > 通过这个结构，用户不仅可以更好地组织密钥，还能在多个设备间同步和恢复钱包状态，同时增加了隐私性和安全性，因为每一个交易只会使用相应路径下的一个新地址。
+
+## 熵与助记词个数的关系
+
++ 16 byte <sub>128 bits</sub> 的熵会产生 12 个助记词；
++ 20 byte <sub>160 bits</sub> 的熵会产生 15 个助记词；
++ 24 byte <sub>192 bits</sub> 的熵会产生 18 个助记词；
++ 32 byte <sub>256 bits</sub> 的熵会产生 24 个助记词。

@@ -15,7 +15,7 @@ value class Mnemonic(val phrase: String) {
          * Generates a mnemonic phrase, given a desired [strength]
          * The [strength] represents the number of entropy bits this phrase encodes and needs to be a multiple of 32
          *
-         * @param strength 强度（长度）
+         * @param strength 强度（长度），128 - 12 个助记词，160 - 15，192 - 18，256 - 24
          * @param lang 语言
          * @return 助记词
          */
@@ -104,15 +104,21 @@ fun MnemonicWords.toEntropy(lang: Language): Entropy {
 /**
  * 助记词生成扩展密钥
  *
- * @param path m/44'/60'/0'/0/0
+ * @param path 默认路径为 m/44'/60'/0'/0/0
  * @param saltPhrase 盐值(密码)
  * @param isGM sm2p256v1 or secp256k1
  * @return 扩展密钥
  */
-fun MnemonicWords.toExtendedKey(path: String, saltPhrase: String = "", isGM: Boolean = true) =
+fun MnemonicWords.toExtendedKey(path: String = DEFAULT_PATH, saltPhrase: String = "", isGM: Boolean = true) =
     toSeed(saltPhrase).toKey(path, isGM)
 
-fun Entropy.toMnemonic(lang: Language): Mnemonic {
+/**
+ * 熵转为助记词
+ *
+ * @param lang 助记词的语言
+ * @return 助记词
+ */
+fun Entropy.toMnemonic(lang: Language = Language.ZH_HANS): Mnemonic {
     if (entropy.size % 4 > 0) {
         throw RuntimeException("Entropy not multiple of 32 bits.")
     }
