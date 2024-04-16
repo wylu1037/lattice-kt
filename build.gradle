@@ -10,6 +10,7 @@ version = '1.0-SNAPSHOT'
 allprojects {
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         mavenLocal()
         gradlePluginPortal()
     }
@@ -22,6 +23,7 @@ ext {
     kotlin_json_version = '1.6.0'
     kbip44_version = '0.5'
     web3j_version = "4.9.8"
+    kethereum_abi_version = "0.86.0"
 }
 
 subprojects {
@@ -49,6 +51,7 @@ subprojects {
             dependency "org.web3j:core:${web3j_version}"
             dependency "org.web3j:utils:${web3j_version}"
             dependency "org.web3j:abi:${web3j_version}"
+            dependency "com.github.komputing.kethereum:abi:${kethereum_abi_version}"
         }
     }
 

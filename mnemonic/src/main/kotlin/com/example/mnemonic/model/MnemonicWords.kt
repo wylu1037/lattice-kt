@@ -1,6 +1,6 @@
 package com.example.mnemonic.model
 
-import toEntropy
+import com.example.mnemonic.toEntropy
 
 data class MnemonicWords(val words: Collection<String>) {
     /**

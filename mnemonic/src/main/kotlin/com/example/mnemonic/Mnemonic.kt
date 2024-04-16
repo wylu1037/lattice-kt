@@ -1,3 +1,5 @@
+package com.example.mnemonic
+
 import com.example.crypto.api.CryptoAPI
 import com.example.mnemonic.model.*
 import com.example.model.extension.toBitArray

@@ -1,13 +1,10 @@
 package com.example.mnemonic
 
-import Mnemonic
 import com.example.crypto.getCompressedPublicKey
 import com.example.mnemonic.model.Language
 import com.example.model.extension.toHexString
 import com.example.model.toAddress
 import org.junit.Test
-import toExtendedKey
-import toMnemonicWords
 import kotlin.test.assertEquals
 
 class MnemonicTest {
