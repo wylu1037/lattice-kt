@@ -1,21 +1,10 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm'
-}
-
-group = 'com.example'
-version = '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
+description = 'lattice'
 
 dependencies {
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
-}
-
-test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(11)
+    implementation project(path: ':model')
+    implementation project(path: ':abi')
+    implementation(
+            "com.squareup.okhttp3:okhttp",
+            "com.google.code.gson:gson",
+    )
 }

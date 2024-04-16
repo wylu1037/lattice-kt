@@ -44,6 +44,8 @@ object Json {
             emptyList()
         }
     }
+
+    fun toJsonString(obj: Any): String = MAPPER.writeValueAsString(obj)
 }
 
 /**
