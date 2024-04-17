@@ -1,9 +1,9 @@
 package com.example.lattice.provider
 
-import com.example.lattice.model.APIPayload
+import com.example.lattice.model.JsonRpcPayload
 
 class WsClient(private val url: URL, private val options: Map<String, String>) : Client {
-    override fun send(body: APIPayload, headers: Map<String, String>): String {
+    override fun send(payload: JsonRpcPayload, headers: Map<String, String>): String {
         TODO("Not yet implemented")
     }
 }

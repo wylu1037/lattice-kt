@@ -3,8 +3,11 @@ description = 'lattice'
 dependencies {
     implementation project(path: ':model')
     implementation project(path: ':abi')
+    implementation project(path: ':rlp')
+    implementation project(path: ':crypto')
     implementation(
             "com.squareup.okhttp3:okhttp",
             "com.google.code.gson:gson",
+            "com.github.komputing.khex:extensions-jvm",
     )
 }

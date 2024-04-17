@@ -3,7 +3,7 @@ package com.example.lattice.model
 typealias JsonRpcIdentifier = String
 typealias JsonRpcId = Int
 
-data class APIPayload(
+data class JsonRpcPayload(
     val jsonRpc: JsonRpcIdentifier = "2.0",
     val id: JsonRpcId = 1,
     val method: String,
@@ -13,7 +13,7 @@ data class APIPayload(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as APIPayload
+        other as JsonRpcPayload
 
         if (jsonRpc != other.jsonRpc) return false
         if (id != other.id) return false

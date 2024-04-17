@@ -1,13 +1,28 @@
 package com.example.lattice.provider
 
-import com.example.lattice.model.APIPayload
+import com.example.lattice.model.JsonRpcPayload
+import com.example.lattice.provider.Protocol.*
 
 interface Client {
-    abstract fun send(body: APIPayload, headers: Map<String, String>): String
+    /**
+     * 发送请求
+     *
+     * @param payload json-rpc payload
+     * @param headers 请求头
+     * @return response
+     */
+    fun send(payload: JsonRpcPayload, headers: Map<String, String>): String
 }
 
+/**
+ * 协议枚举
+ *
+ * @property HTTP
+ * @property WS
+ * @property UNKNOWN
+ */
 enum class Protocol {
-    UNKNOWN, HTTP, WS, IPC
+    HTTP, WS, UNKNOWN
 }
 
 @JvmInline
@@ -20,7 +35,7 @@ value class URL(val value: String)
  */
 fun URL.newClient(): Client {
     return when (detectProtocol()) {
-        Protocol.HTTP -> HttpClient(this, emptyMap())
+        HTTP -> HttpClient(this, emptyMap())
         Protocol.WS -> throw UnsupportedOperationException("ws is unsupported protocol")
         else -> throw UnsupportedOperationException("unsupported protocol")
     }
@@ -28,10 +43,10 @@ fun URL.newClient(): Client {
 
 fun URL.detectProtocol(): Protocol {
     if ("^(http(s)?://)\\w+\\S+(\\.\\S+)+$".toRegex().matches(value)) {
-        return Protocol.HTTP
+        return HTTP
     } else if ("^(ws?://)\\w+\\S+(\\.\\S+)+$".toRegex().matches(value)) {
-        return Protocol.WS
+        return WS
     }
-    return Protocol.UNKNOWN
+    return UNKNOWN
 }
 

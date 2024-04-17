@@ -41,7 +41,7 @@ fun PublicKey.toAddress(isGM: Boolean = true): Address {
     val d1 = hashArr.sha256()
     val d2 = d1.sha256()
     val d3 = hashArr.plus(d2.sliceArray(0..3))
-    return Address("zltc_" + Base58.encode(d3))
+    return Address(LATTICE_ADDRESS_PREFIX + Base58.encode(d3))
 }
 
 data class ECKeyPair(val privateKey: PrivateKey, val publicKey: PublicKey)

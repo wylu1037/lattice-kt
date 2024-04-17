@@ -1,10 +1,10 @@
 package com.example.lattice.provider
 
-import com.example.abi.Json
-import com.example.lattice.model.APIPayload
+import com.example.lattice.gson
+import com.example.lattice.model.APPLICATION_JSON
 import com.example.lattice.model.BaseRequest
+import com.example.lattice.model.JsonRpcPayload
 import okhttp3.ConnectionPool
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit
 
 class HttpClient(private val url: URL, private val options: Map<String, String>) : Client {
 
-    override fun send(body: APIPayload, headers: Map<String, String>): String {
-        val parameters = body.let {
+    override fun send(payload: JsonRpcPayload, headers: Map<String, String>): String {
+        val parameters = payload.let {
             mapOf(
                 "id" to it.id,
                 "jsonRpc" to it.jsonRpc,
@@ -28,12 +28,10 @@ class HttpClient(private val url: URL, private val options: Map<String, String>)
         }
         return response.body.string()
     }
-
 }
 
 object HttpClientFactory {
 
-    // http连接池
     private const val MAX_IDLE_CONNECTIONS = 50 // 最大空闲连接数
     private const val KEEP_ALIVE_DURATION = 30L // 连接的保持时间
     private const val CONNECT_TIMEOUT = 90L
@@ -54,8 +52,7 @@ object HttpClientFactory {
 }
 
 fun post(request: BaseRequest): Response {
-    val params = Json.toJsonString(request.params!!)
-    val body = params.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    val body = gson.toJson(request.params).toRequestBody(APPLICATION_JSON)
     val builder = Request.Builder().post(body).url(request.url.value)
     if (request.headers?.isNotEmpty() == true) {
         request.headers.forEach { (t, u) ->

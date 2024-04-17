@@ -27,3 +27,15 @@ fun ByteArray.toBitArray(): BooleanArray {
 }
 
 fun ByteArray.toHexString() = "0x" + Hex.toHexString(this)
+
+/**
+ * remove leading zeros from the byte array
+ *
+ * @return 去除前导0的自己数组
+ */
+fun ByteArray.stripZeros(): ByteArray {
+    if (isEmpty()) return this
+    var start = 0
+    while (start < size && this[start] == 0.toByte()) start++
+    return this.copyOfRange(start, size)
+}
