@@ -9,6 +9,7 @@ import com.example.model.extension.toByteArray
 import com.example.rlp.RLPList
 import com.example.rlp.encode
 import com.example.rlp.toRLP
+import org.komputing.khex.extensions.toHexString
 import org.komputing.khex.model.HexString
 import java.math.BigInteger
 
@@ -26,7 +27,7 @@ data class Transaction(
     var hub: Array<String> = emptyArray(),
     var code: String? = null,
     val codeHash: String? = null,
-    var payload: String? = "0x00",
+    var payload: String? = "0x",
     var amount: Long = 0,
     var income: Long? = null,
     var joule: Long = 0,
@@ -102,7 +103,7 @@ fun Transaction.hashSeal(
     chainId: Int,
     isGM: Boolean = true,
     useProofOfWork: Boolean = false,
-    isSign: Boolean = true
+    isSign: Boolean = false
 ): ByteArray {
     val raw = mutableListOf<Any>()
     raw.add(number.toByteArray())
