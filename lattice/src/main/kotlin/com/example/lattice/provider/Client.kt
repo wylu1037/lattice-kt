@@ -35,8 +35,8 @@ value class URL(val value: String)
  */
 fun URL.newClient(): Client {
     return when (detectProtocol()) {
-        HTTP -> HttpClient(this, emptyMap())
-        Protocol.WS -> throw UnsupportedOperationException("ws is unsupported protocol")
+        HTTP -> HTTPClient(this)
+        WS -> throw UnsupportedOperationException("ws is unsupported protocol")
         else -> throw UnsupportedOperationException("unsupported protocol")
     }
 }

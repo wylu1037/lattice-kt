@@ -11,7 +11,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.util.concurrent.TimeUnit
 
-class HttpClient(private val url: URL, private val options: Map<String, String>) : Client {
+class HTTPClient(private val url: URL, private val options: Map<String, String> = emptyMap()) : Client {
 
     override fun send(payload: JsonRpcPayload, headers: Map<String, String>): String {
         val parameters = payload.let {
