@@ -26,6 +26,18 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
     private val domainParams = getDomainParams(curveName)
     private val sm2P = "FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF".toBigInteger(16)
 
+    /**
+     * r、s: r 和 s 是两个大整数，它们是通过对消息哈希值应用椭圆曲线密码学运算得出的。在签名生成过程中，通过私钥对哈希值进行操作后会产生两个随机数，
+     *       分别是 r 和 s。这两个值共同构成签名的核心部分，能够证明签名者拥有对应公钥的私钥，并且同意了签名的消息内容。
+     * v: 在某些签名实现中（例如以太坊的ECDSA签名），v 是一个额外的值，用来表示签名过程中使用的椭圆曲线点的奇偶性，或者在某些情况下用于标识签名算法
+     *    的版本或恢复标识符。v 的取值范围通常会根据具体实现有所不同，但它同样是签名验证过程中的重要组成部分，用于确定签名的有效性和恢复原始签名者的公钥。
+     * e: 在 SM2 签名的情况下，e 是计算过程中需要的一个中间值，代表了消息经过特定哈希处理后的结果。
+     *    在 ECDSA 签名中通常称为“被签名的消息摘要”（hashed message），在这里可能是针对 SM2 标准进行了相应的计算调整。
+     *
+     * @param message 待签名消息
+     * @param privateKey 私钥
+     * @return 签名结果
+     */
     override fun sign(message: ByteArray, privateKey: BigInteger): SignatureData {
         if (curveName == sm2p256v1) {
             val signer = SM2Signer()
@@ -55,6 +67,15 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
         }
     }
 
+    /**
+     * 根据给定的消息(message)、公钥(publicKey)以及签名数据(signature)计算恢复标识符(recId)，
+     * 恢复标识符用于从签名数据中恢复原始签名密钥。
+     *
+     * @param message 消息
+     * @param publicKey 公钥
+     * @param signature 签名
+     * @return 恢复标识符
+     */
     private fun calculateRecId(message: ByteArray, publicKey: BigInteger, signature: SignatureData): Int {
         for (i in 0..3) {
             val k = recover(i, message, signature)
@@ -135,7 +156,8 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
             signer.verifySignature(sig)
         } else {
             val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-            byteArrayOf(4).plus(publicKeyArray).let {
+            publicKeyArray[0] = 4
+            publicKeyArray.let {
                 val publicKeyParameters =
                     ECPublicKeyParameters(domainParams.curve.decodePoint(it), domainParams)
                 signer.init(false, publicKeyParameters)
