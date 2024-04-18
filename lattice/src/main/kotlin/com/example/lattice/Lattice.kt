@@ -17,11 +17,51 @@ internal val gson by lazy {
 }
 
 interface ILattice {
+    /**
+     * 获取包括pending状态在内的账户余额
+     *
+     * @param address 账户地址
+     * @return 余额
+     */
     fun getBalanceWithPending(address: Address): Balance
+
+    /**
+     * 获取创世区块
+     *
+     * @return 创建区块
+     */
     fun getGenesis(): TBlock
+
+    /**
+     * 获取账户最新的区块信息
+     *
+     * @param address 账户地址
+     * @return 区块信息
+     */
     fun getCurrentTDBlock(address: Address): CurrentTDBlock
+
+    /**
+     * 获取账户最新的区块信息，失败则获取创世区块信息
+     *
+     * @param address 账户地址
+     * @return 区块信息
+     */
     fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock
+
+    /**
+     * 发送已签名的交易到链上
+     *
+     * @param signedTx 已经签名的交易
+     * @return 交易哈希
+     */
     fun sendRawTBlock(signedTx: Transaction): String
+
+    /**
+     * 获取交易的回执信息
+     *
+     * @param hash 交易哈希
+     * @return 回执
+     */
     fun getReceipt(hash: String): Receipt
 }
 
@@ -47,13 +87,7 @@ class Lattice(url: URL, private var chainId: Int, jwtToken: String? = null) : IL
         }
         return ret.result
     }
-
-    /**
-     * get account total balance
-     *
-     * @param address account address
-     * @return Balance
-     */
+    
     override fun getBalanceWithPending(address: Address): Balance {
         return sendUseJsonRpc("latc_getBalanceWithPending", arrayOf(address.hex))
     }

@@ -21,7 +21,7 @@ internal const val HTTP_URL = "http://192.168.1.115:14000"
 
 class LatticeTest {
 
-    private val lattice: Lattice = Lattice(URL(HTTP_URL), CHAIN_ID)
+    private val lattice: ILattice = Lattice(URL(HTTP_URL), CHAIN_ID)
 
     @Test
     fun `get balance`() {
