@@ -60,10 +60,10 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
             val r = components[0]
             val s = components[1]
 
-            val recId = calculateRecId(message, publicFromPrivate(privateKey), SignatureData(r, s))
-            val headerByte = recId + 27
+            //recovery id取值范围为[0..3]
+            val recoveryId = calculateRecId(message, publicFromPrivate(privateKey), SignatureData(r, s))
 
-            return SignatureData(r, s, headerByte.toBigInteger())
+            return SignatureData(r, s, recoveryId.toBigInteger())
         }
     }
 

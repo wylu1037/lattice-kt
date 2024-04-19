@@ -1,6 +1,5 @@
 package com.example.model
 
-import com.example.model.extension.toHexStringNoPrefix
 import com.example.model.extension.toHexStringZeroPadded
 import org.komputing.khex.extensions.clean0xPrefix
 import org.komputing.khex.extensions.isValidHex
@@ -40,7 +39,7 @@ data class SignatureData constructor(
 fun SignatureData.toHex(prefix: String = HEX_PREFIX) = if (e != BigInteger.ZERO) {
     prefix + r.to64Hex() + s.to64Hex() + "01" + e.to64Hex()
 } else {
-    prefix + r.to64Hex() + s.to64Hex() + v.toHexStringNoPrefix()
+    prefix + r.to64Hex() + s.to64Hex() + v.toHexStringZeroPadded(2, false)
 }
 
 private fun BigInteger.to64Hex() = toHexStringZeroPadded(64, false)
