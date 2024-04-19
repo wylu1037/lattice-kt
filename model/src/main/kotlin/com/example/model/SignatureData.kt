@@ -16,7 +16,7 @@ data class SignatureData constructor(
 ) {
     companion object {
         fun fromHexString(signature: String): SignatureData {
-            if (HexString(signature).isValidHex()) {
+            if (!HexString(signature).isValidHex()) {
                 throw SignatureException("Invalid signature $signature")
             }
             val cleanedHex = HexString(signature).clean0xPrefix().string
@@ -24,12 +24,12 @@ data class SignatureData constructor(
                 throw SignatureException("Signature hex too short, expected more than 128 bytes")
             }
 
-            val r = BigInteger(signature.substring(0, 64), 16)
-            val s = BigInteger(signature.substring(64, 128), 16)
-            val v = BigInteger(signature.substring(128, 130), 16)
+            val r = BigInteger(cleanedHex.substring(0, 64), 16)
+            val s = BigInteger(cleanedHex.substring(64, 128), 16)
+            val v = BigInteger(cleanedHex.substring(128, 130), 16)
 
-            if (signature.length > 130) {
-                val e = BigInteger(signature.substring(130), 16)
+            if (cleanedHex.length > 130) {
+                val e = BigInteger(cleanedHex.substring(130), 16)
                 return SignatureData(r, s, v, e)
             }
             return SignatureData(r, s, v)
