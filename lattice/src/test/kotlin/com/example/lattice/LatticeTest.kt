@@ -12,12 +12,12 @@ import com.example.model.toHex
 import org.junit.Test
 import java.time.Instant
 
-internal const val ACCOUNT_ADDRESS_STR = "zltc_T3MMEH9S2bSzo5EDiAt6H8KiXZvchGyw2"
+internal const val ACCOUNT_ADDRESS_STR = "zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi"
 internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
-internal const val PRIVATE_KEY_HEX = "0x663e2481bf5645cf80705d5a180d2937f72ba8ba3e1b14b34064a42ec2b1ae74"
+internal const val PRIVATE_KEY_HEX = "0x23d5b2a2eb0a9c8b86d62cbc3955cfd1fb26ec576ecc379f402d0f5d2b27a7bb"
 internal const val IS_GM = true
-internal const val CHAIN_ID = 2
-internal const val HTTP_URL = "http://192.168.1.115:14000"
+internal const val CHAIN_ID = 1
+internal const val HTTP_URL = "http://192.168.1.115:13000"
 
 class LatticeTest {
 

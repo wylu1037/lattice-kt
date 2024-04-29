@@ -12,6 +12,7 @@ import org.bouncycastle.util.encoders.Hex
 import org.kethereum.abi.model.EthereumABIElement
 import org.kethereum.abi.model.EthereumNamedType
 import org.web3j.abi.FunctionEncoder
+import org.web3j.abi.FunctionReturnDecoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.*
 import org.web3j.abi.datatypes.Function
@@ -65,13 +66,18 @@ data class LatticeFunction(val abi: String, val methodName: String? = null, val 
 fun LatticeFunction.encode(args: Array<Any>): String =
     FunctionEncoder.encode(Function(methodName, convertArguments(method.inputs, args), emptyList()))
 
+fun LatticeFunction.decode(rawCode: String): List<Type<*>> {
+    val (input, _) = getTypeReferences()
+    return FunctionReturnDecoder.decode(rawCode, input)
+}
+
 
 /**
  * 获取 Abi 中方法的输入输出定义
  *
  * @return Pair
  */
-fun LatticeFunction.getTypeReferences(): Pair<List<TypeReference<*>>, List<TypeReference<*>>> {
+fun LatticeFunction.getTypeReferences(): Pair<List<TypeReference<Type<*>>>, List<TypeReference<Type<*>>>> {
     val abiDefinitions = Json.toList<AbiDefinition>(abi)
     val definition = abiDefinitions.filter(methodName)
 
@@ -128,9 +134,12 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
     println(namedType.type)
     val type = namedType.type
     return when {
-        type == Types.ADDRESS.value -> Address(
-            arg as? String ?: throw IllegalArgumentException("Invalid argument type, Address needs to be String")
-        )
+        type == Types.ADDRESS.value -> {
+            val addr =
+                arg as? String ?: throw IllegalArgumentException("Invalid argument type, Address needs to be String")
+            if (!addr.startsWith("0x")) throw IllegalArgumentException("Invalid argument value, Address needs to be start with 0x")
+            return Address(addr)
+        }
 
         type == Types.STRING.value -> Utf8String(
             arg as? String ?: throw IllegalArgumentException("Invalid argument type, String needs to be String")
