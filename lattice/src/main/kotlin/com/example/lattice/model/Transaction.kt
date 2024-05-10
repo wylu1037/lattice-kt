@@ -122,7 +122,7 @@ fun Transaction.hashSeal(
         raw.add(DIFFICULTY_BYTE_ARRAY)
         raw.add(POW_BYTE_ARRAY)
     }
-    raw.add(payload ?: "0x")
+    raw.add(payload ?: HEX_PREFIX)
     raw.add(timestamp.toByteArray())
     raw.add((chainId.toLong()).toByteArray())
     if (isSign) {
@@ -162,3 +162,62 @@ fun Transaction.toSendTBlock() = SendTBlock(
     version,
     difficulty
 )
+
+fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: Boolean = false): String {
+    // 组装raw
+    val raw = mutableListOf<Any>()
+    raw.add(number.toByteArray())
+    raw.add(type.hex)
+    raw.add(parentHash)
+    raw.add(daemonHash)
+
+    val codeHash = if (codeHash.isNullOrBlank()) {
+        if (code.isNullOrBlank()) ZERO_HASH else HexString(this.code!!).hash(isGM).toHexString()
+    } else {
+        this.codeHash
+    }
+    raw.add(codeHash)
+
+    raw.add(owner.toEthereumAddress())
+    raw.add(linker!!.toEthereumAddress())
+    raw.add(hub)
+    raw.add(amount.toByteArray())
+    raw.add((income ?: 0).toByteArray())
+    raw.add(joule.toByteArray())
+
+    if (useProofOfWork) {
+        raw.add("0x00")
+    } else {
+        raw.add(DIFFICULTY_BYTE_ARRAY)
+        raw.add(POW_BYTE_ARRAY)
+    }
+
+    raw.add(payload ?: HEX_PREFIX)
+
+    raw.add(timestamp.toByteArray())
+    raw.add(sign!!) // 1.4的链需要
+
+    // 1.4的链不需要以下部分了
+    /*val signature = SignatureData.fromHex(this.sign!!.replace("0x", ""))
+    raw.add(signature.e)
+    raw.add(signature.v.add(BigInteger.valueOf(chainId).multiply(BigInteger.valueOf(2))))
+    raw.add(signature.r)
+    raw.add(signature.s)*/
+
+    if (version > 1) {
+        raw.add(version.toLong().toByteArray()) // nuwa
+    }
+
+    val rlp = RLPList(
+        raw.map {
+            when (it) {
+                is String -> it.toRLP()
+                is BigInteger -> it.toRLP()
+                is ByteArray -> it.toRLP()
+                is Array<*> -> it.toRLP()
+                else -> it.toString().toRLP()
+            }
+        }
+    ).encode()
+    return rlp.hash(true).toHexString()
+}
