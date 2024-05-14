@@ -3,13 +3,12 @@ package com.example.lattice
 import com.example.abi.LatticeAbi
 import com.example.abi.encode
 import com.example.abi.getFunction
-import com.example.lattice.model.Transaction
-import com.example.lattice.model.TxTypeEnum
-import com.example.lattice.model.sign
+import com.example.lattice.model.*
 import com.example.lattice.provider.URL
 import com.example.model.Address
 import com.example.model.toHex
 import org.junit.Test
+import java.io.File
 import java.time.Instant
 
 internal const val ACCOUNT_ADDRESS_STR = "zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi"
@@ -122,5 +121,39 @@ class LatticeTest {
         val hash = lattice.sendRawTBlock(tx)
         val receipt = lattice.getReceipt(hash)
         println(gson.toJson(receipt))
+    }
+
+    @Test
+    fun `build payload tx`() {
+        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val filePath = "./data.txt"
+        val file = File(filePath)
+        if (!file.exists()) file.createNewFile()
+
+        file.printWriter().use { out ->
+            for (i in 1..10000) {
+                val tx = Transaction(
+                    number = latestTBlock.currentTBlockNumber + 1,
+                    parentHash = latestTBlock.currentTBlockHash,
+                    daemonHash = latestTBlock.currentDBlockHash,
+                    payload = "0x01",
+
+                    timestamp = Instant.now().epochSecond,
+                    owner = Address(ACCOUNT_ADDRESS_STR),
+                    linker = Address(LINKER_ADDRESS_STR),
+                    type = TxTypeEnum.SEND
+                )
+                val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
+                tx.sign = signature.toHex()
+
+                val hash = tx.calculateTransactionHash()
+
+                latestTBlock.currentTBlockHash = hash
+                latestTBlock.currentTBlockNumber = tx.number
+
+
+                out.println(gson.toJson(tx.toSendTBlock()))
+            }
+        }
     }
 }

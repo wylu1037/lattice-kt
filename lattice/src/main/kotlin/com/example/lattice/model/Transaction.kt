@@ -163,8 +163,13 @@ fun Transaction.toSendTBlock() = SendTBlock(
     difficulty
 )
 
+/**
+ * calculate transaction hash
+ *
+ * @param isGM sm2p256v1 or secp256k1
+ * @param useProofOfWork default false
+ */
 fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: Boolean = false): String {
-    // 组装raw
     val raw = mutableListOf<Any>()
     raw.add(number.toByteArray())
     raw.add(type.hex)
@@ -205,7 +210,7 @@ fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: B
     raw.add(signature.s)*/
 
     if (version > 1) {
-        raw.add(version.toLong().toByteArray()) // nuwa
+        raw.add(version.toLong().toByteArray())
     }
 
     val rlp = RLPList(
