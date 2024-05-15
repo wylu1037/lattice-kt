@@ -9,13 +9,13 @@ internal val APPLICATION_JSON = "application/json; charset=utf-8".toMediaTypeOrN
 /**
  * 交易类型枚举
  *
- * @property GENESIS
- * @property CREATE
+ * @property GENESIS 创世交易
+ * @property CREATE 铸造交易
  * @property SEND 发送交易
  * @property RECEIVE 接收交易
  * @property CONTRACT 部署合约
  * @property EXECUTE 执行合约
- * @property UPDATE
+ * @property UPDATE 升级合约
  */
 enum class TxTypeEnum(val hex: String) {
     GENESIS("0x00"),

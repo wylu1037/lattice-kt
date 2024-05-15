@@ -142,6 +142,9 @@ fun Transaction.hashSeal(
     return rlp.hash(isGM)
 }
 
+/**
+ * convert Transaction to SendTBlock
+ */
 fun Transaction.toSendTBlock() = SendTBlock(
     number,
     parentHash,
@@ -168,6 +171,7 @@ fun Transaction.toSendTBlock() = SendTBlock(
  *
  * @param isGM sm2p256v1 or secp256k1
  * @param useProofOfWork default false
+ * @return transaction hash
  */
 fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: Boolean = false): String {
     val raw = mutableListOf<Any>()
@@ -177,9 +181,9 @@ fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: B
     raw.add(daemonHash)
 
     val codeHash = if (codeHash.isNullOrBlank()) {
-        if (code.isNullOrBlank()) ZERO_HASH else HexString(this.code!!).hash(isGM).toHexString()
+        if (code.isNullOrBlank()) ZERO_HASH else HexString(code!!).hash(isGM).toHexString()
     } else {
-        this.codeHash
+        codeHash
     }
     raw.add(codeHash)
 
@@ -203,7 +207,7 @@ fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: B
     raw.add(sign!!) // 1.4的链需要
 
     // 1.4的链不需要以下部分了
-    /*val signature = SignatureData.fromHex(this.sign!!.replace("0x", ""))
+    /*val signature = SignatureData.fromHex(sign!!.replace("0x", ""))
     raw.add(signature.e)
     raw.add(signature.v.add(BigInteger.valueOf(chainId).multiply(BigInteger.valueOf(2))))
     raw.add(signature.r)
