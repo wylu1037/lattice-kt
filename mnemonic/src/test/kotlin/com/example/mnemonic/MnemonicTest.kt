@@ -1,16 +1,37 @@
 package com.example.mnemonic
 
+import com.example.crypto.createKeyPair
 import com.example.crypto.getCompressedPublicKey
 import com.example.mnemonic.model.Language
 import com.example.model.extension.toHexString
 import com.example.model.toAddress
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class MnemonicTest {
 
     @Test
-    fun `generate root keypair for sm2p256v1`() {
+    fun `generate key pair`() {
+        val keypair = createKeyPair()
+        println(keypair.privateKey.key.toHexString())
+        assertNotNull(keypair)
+    }
+
+    @Test
+    fun derive() {
+        // val entropy = Entropy(createKeyPair().privateKey.key.toByteArray())
+        // val mnemonic = entropy.toMnemonic()
+        // println(mnemonic)
+        val mnemonic = Mnemonic("刚 灵 柱 仅 庄 基 画 龄 累 析 飞 阅 海 们 德 否 央 群 毁 渔 康 老 咨 鼻")
+        for (i in 0..100) {
+            val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/$i", "Root1234")
+            println(key.keyPair.privateKey.key.toHexString())
+        }
+    }
+
+    @Test
+    fun `generate keypair for sm2p256v1`() {
         val isGM = true
         val mnemonic = Mnemonic.generate(128, Language.ZH_HANS)
         val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/0", "Root1234", isGM)
@@ -29,7 +50,7 @@ class MnemonicTest {
 
     @Test
     fun `derive child keypair for sm2p256v1`() {
-        val isGM = true;
+        val isGM = true
         val mnemonic = Mnemonic("笔 余 罩 老 配 速 历 在 联 烧 拨 郎")
         val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/1", "Root1234", isGM)
         val privateKey = key.keyPair.privateKey.key.toHexString()
@@ -43,7 +64,7 @@ class MnemonicTest {
 
     @Test
     fun `mnemonic to keypair for sm2p256v1`() {
-        val isGM = true;
+        val isGM = true
         val mnemonic = Mnemonic("笔 余 罩 老 配 速 历 在 联 烧 拨 郎")
         val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/0", "Root1234", isGM)
         val privateKey = key.keyPair.privateKey.key.toHexString()
