@@ -18,8 +18,8 @@ fun ByteArray.removeLeadingZero(): ByteArray {
 }
 
 fun ByteArray.toBitArray(): BooleanArray {
-    val bits = BooleanArray(this.size * 8)
-    for (byteIndex in this.indices)
+    val bits = BooleanArray(size * 8)
+    for (byteIndex in indices)
         for (bitIndex in 0..7) {
             bits[byteIndex * 8 + bitIndex] = (1 shl (7 - bitIndex)) and this[byteIndex].toInt() != 0
         }

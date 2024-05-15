@@ -17,7 +17,7 @@ data class MnemonicWords(val words: Collection<String>) {
      */
     constructor(phrases: Array<String>) : this(phrases.toList())
 
-    override fun toString() = this.words.joinToString(" ")
+    override fun toString() = words.joinToString(" ")
 }
 
 fun MnemonicWords.validate(lang: Language) = try {

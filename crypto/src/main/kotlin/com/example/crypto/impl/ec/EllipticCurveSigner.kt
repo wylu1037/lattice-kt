@@ -191,11 +191,11 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
     }
 
     private fun BigInteger.isOdd(): Boolean {
-        return this.abs().toByteArray()[0].toInt() == 1
+        return abs().toByteArray()[0].toInt() == 1
     }
 
     private fun getSM2Scalar(a: ByteArray): ByteArray {
-        var scalarBytes: ByteArray
+        val scalarBytes: ByteArray
         val result = ByteArray(32)
 
         val n = a.toBigInteger()

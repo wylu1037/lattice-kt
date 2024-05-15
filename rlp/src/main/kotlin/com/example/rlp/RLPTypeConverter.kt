@@ -10,14 +10,14 @@ import java.math.BigInteger.ZERO
 /**
  * RLP as of Appendix B. Recursive Length Prefix at https://github.com/ethereum/yellowpaper
  */
-fun String.toRLP() = if (this.startsWith("0x")) {
-    val str = this.substring(2)
+fun String.toRLP() = if (startsWith("0x")) {
+    val str = substring(2)
     if (str.isEmpty()) {
         byteArrayOf().toRLP()
     } else {
         HexString(str).hexToByteArray().toRLP()
     }
-} else if (this.isBlank()) {
+} else if (isBlank()) {
     byteArrayOf().toRLP()
 } else {
     RLPElement(toByteArray())
@@ -29,16 +29,16 @@ fun ByteArray.toRLP() = RLPElement(this)
 fun Byte.toRLP() = RLPElement(ByteArray(1) { this })
 
 fun Array<*>.toRLP(): RLPList {
-    return if (this.isArrayOf<String>()) {
-        RLPList(this.map { (it as String).toRLP() })
-    } else if (this.isArrayOf<Int>()) {
-        RLPList(this.map { (it as Int).toRLP() })
-    } else if (this.isArrayOf<BigInteger>()) {
-        RLPList(this.map { (it as BigInteger).toRLP() })
-    } else if (this.isArrayOf<Byte>()) {
-        RLPList(this.map { (it as Byte).toRLP() })
+    return if (isArrayOf<String>()) {
+        RLPList(map { (it as String).toRLP() })
+    } else if (isArrayOf<Int>()) {
+        RLPList(map { (it as Int).toRLP() })
+    } else if (isArrayOf<BigInteger>()) {
+        RLPList(map { (it as BigInteger).toRLP() })
+    } else if (isArrayOf<Byte>()) {
+        RLPList(map { (it as Byte).toRLP() })
     } else {
-        RLPList(this.map { it.toString().toRLP() })
+        RLPList(map { it.toString().toRLP() })
     }
 }
 

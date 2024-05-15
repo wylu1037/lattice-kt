@@ -2,7 +2,7 @@ package com.example.model.extension
 
 import kotlin.experimental.or
 
-fun BooleanArray.toByteArray(len: Int = this.size / 8): ByteArray {
+fun BooleanArray.toByteArray(len: Int = size / 8): ByteArray {
     val result = ByteArray(len)
     for (byteIndex in result.indices)
         for (bitIndex in 0..7)
