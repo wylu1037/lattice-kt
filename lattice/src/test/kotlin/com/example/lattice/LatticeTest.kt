@@ -7,6 +7,10 @@ import com.example.lattice.model.*
 import com.example.lattice.provider.URL
 import com.example.model.Address
 import com.example.model.toHex
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.io.File
 import java.time.Instant
@@ -151,9 +155,60 @@ class LatticeTest {
                 latestTBlock.currentTBlockHash = hash
                 latestTBlock.currentTBlockNumber = tx.number
 
-
                 out.println(gson.toJson(tx.toSendTBlock()))
             }
+        }
+    }
+
+    @Test
+    fun `multiple build payload`() {
+        val accounts = arrayOf("zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi", "zltc_RvmBhKxeLojxYCCoMM4iaxpkeJ1FjLBHQ")
+        val privateKeys = arrayOf(
+            "0x23d5b2a2eb0a9c8b86d62cbc3955cfd1fb26ec576ecc379f402d0f5d2b27a7bb",
+            "0xa83691e0d2241fa9a8bc90f8d27a5aac4d4619f964963a80481e174b773f356a"
+        )
+        // 每个账户生成多少笔交易
+        val count = 10000
+
+        runBlocking {
+            val deferredArray = mutableListOf<Deferred<Unit>>()
+            for ((index, account) in accounts.withIndex()) {
+
+                val deferredRes = async {
+                    val file = File("./data$index.txt")
+                    if (!file.exists()) file.createNewFile()
+
+                    val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(account))
+
+                    file.printWriter().use { out ->
+                        for (i in 1..count) {
+                            val tx = Transaction(
+                                number = latestTBlock.currentTBlockNumber + 1,
+                                parentHash = latestTBlock.currentTBlockHash,
+                                daemonHash = latestTBlock.currentDBlockHash,
+                                payload = "0x01",
+
+                                timestamp = Instant.now().epochSecond,
+                                owner = Address(account),
+                                linker = Address(LINKER_ADDRESS_STR),
+                                type = TxTypeEnum.SEND
+                            )
+                            val (_, signature) = tx.sign(privateKeys[index], IS_GM, CHAIN_ID)
+                            tx.sign = signature.toHex()
+
+                            val hash = tx.calculateTransactionHash()
+
+                            latestTBlock.currentTBlockHash = hash
+                            latestTBlock.currentTBlockNumber = tx.number
+
+                            out.println(gson.toJson(tx.toSendTBlock()))
+                        }
+                    }
+                }
+
+                deferredArray.add(deferredRes)
+            }
+            deferredArray.awaitAll()
         }
     }
 }

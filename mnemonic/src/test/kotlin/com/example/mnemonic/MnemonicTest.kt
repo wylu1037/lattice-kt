@@ -15,6 +15,7 @@ class MnemonicTest {
     fun `generate key pair`() {
         val keypair = createKeyPair()
         println(keypair.privateKey.key.toHexString())
+        println(keypair.publicKey.toAddress())
         assertNotNull(keypair)
     }
 
