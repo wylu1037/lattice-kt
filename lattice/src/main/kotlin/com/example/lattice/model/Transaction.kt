@@ -228,5 +228,5 @@ fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: B
             }
         }
     ).encode()
-    return rlp.hash(true).toHexString()
+    return rlp.hash(isGM).toHexString()
 }
