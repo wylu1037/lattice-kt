@@ -131,7 +131,6 @@ fun convertArguments(types: List<EthereumNamedType>?, args: Array<Any>): List<Ty
 }
 
 fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
-    println(namedType.type)
     val type = namedType.type
     return when {
         type == Types.ADDRESS.value -> {
