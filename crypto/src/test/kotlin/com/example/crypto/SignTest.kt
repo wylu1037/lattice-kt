@@ -4,6 +4,7 @@ import com.example.crypto.extension.toECKeyPair
 import com.example.model.PrivateKey
 import com.example.model.SignatureData
 import com.example.model.extension.toHexString
+import com.example.model.toAddress
 import com.example.model.toHex
 import org.junit.Test
 import org.komputing.khex.extensions.hexToByteArray
@@ -38,10 +39,19 @@ class SignTest {
         val result = keypair.publicKey.verifySignature(message, signature, isGM)
         println(result)
     }
-    
+
     @Test
     fun `new keypair`() {
         val keypair = createKeyPair(true)
         println(keypair.privateKey.key.toHexString())
+    }
+
+    @Test
+    fun `recovery keypair from private key`() {
+        val privateKey = "23d5b2a2eb0a9c8b86d62cbc3955cfd1fb26ec576ecc379f402d0f5d2b27a7bb"
+        val keypair = PrivateKey(HexString(privateKey)).toECKeyPair(true)
+        println(keypair.publicKey.key.toHexString())
+        val address = keypair.publicKey.toAddress(true)
+        println(address)
     }
 }

@@ -6,6 +6,7 @@ import com.example.abi.getFunction
 import com.example.lattice.model.*
 import com.example.lattice.provider.URL
 import com.example.model.Address
+import com.example.model.toEthereumAddress
 import com.example.model.toHex
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -20,7 +21,7 @@ internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
 internal const val PRIVATE_KEY_HEX = "0x23d5b2a2eb0a9c8b86d62cbc3955cfd1fb26ec576ecc379f402d0f5d2b27a7bb"
 internal const val IS_GM = true
 internal const val CHAIN_ID = 1
-internal const val HTTP_URL = "http://192.168.1.115:13000"
+internal const val HTTP_URL = "http://192.168.1.115:14000"
 
 class LatticeTest {
 
@@ -187,7 +188,6 @@ class LatticeTest {
                                 parentHash = latestTBlock.currentTBlockHash,
                                 daemonHash = latestTBlock.currentDBlockHash,
                                 payload = "0x01",
-
                                 timestamp = Instant.now().epochSecond,
                                 owner = Address(account),
                                 linker = Address(LINKER_ADDRESS_STR),
@@ -211,4 +211,88 @@ class LatticeTest {
             deferredArray.awaitAll()
         }
     }
+
+
+    @Test
+    fun `execute contract`() {
+        val abi =
+            "[{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolSuite\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"addProtocol\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"name\":\"getAddress\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Protocol[]\",\"name\":\"protocol\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"updateProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"getTraceability\",\"outputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"number\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"protocol\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Evidence[]\",\"name\":\"evi\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"writeTraceability\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"internalType\":\"struct Business.batch[]\",\"name\":\"bt\",\"type\":\"tuple[]\"}],\"name\":\"writeTraceabilityBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val method = "writeTraceability"
+
+        val times = 1000
+        for (i in 1..times) {
+            val code = LatticeAbi(abi).getFunction(method).encode(
+                arrayOf(
+                    64424509441,
+                    generateDataId(),
+                    generateStringArr(20),
+                    Address("zltc_YBomBNykwMqxm719giBL3VtYV4ABT9a8D").toEthereumAddress()
+                )
+            )
+
+            val tx = Transaction(
+                number = latestTBlock.currentTBlockNumber + 1,
+                parentHash = latestTBlock.currentTBlockHash,
+                daemonHash = latestTBlock.currentDBlockHash,
+                timestamp = Instant.now().epochSecond,
+                owner = Address(ACCOUNT_ADDRESS_STR),
+                linker = Address("zltc_QLbz7JHiBTspUvTPzLHy5biDS9mu53mmv"),
+                type = TxTypeEnum.EXECUTE,
+                code = code
+            )
+            val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
+            tx.sign = signature.toHex()
+
+            val hash = lattice.sendRawTBlock(tx)
+            println("交易哈希：$hash")
+            val receipt = lattice.getReceipt(hash)
+            println("交易回执：${gson.toJson(receipt)}")
+        }
+    }
+
+
+    @Test
+    fun `send transaction temp`() {
+        val chainId = 1
+        val accountAddress = "zltc_RzdiApWtmC2W5tDvdH6C9xcHs1cFcd2aq"
+        val privateKey = "0x29cbd6aa68b56f1b6709ba89bed6529e3885ac37718938d84862518ecc43e607"
+        val lattice: ILattice = Lattice(URL("http://192.168.1.115:13000"), chainId)
+        //val lattice: ILattice = Lattice(URL("http://192.168.1.115:13000"), chainId)
+        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(accountAddress))
+        val tx = Transaction(
+            number = latestTBlock.currentTBlockNumber + 1,
+            parentHash = latestTBlock.currentTBlockHash,
+            daemonHash = latestTBlock.currentDBlockHash,
+            payload = "0x01",
+            timestamp = Instant.now().epochSecond,
+            owner = Address(accountAddress),
+            linker = Address(LINKER_ADDRESS_STR),
+            type = TxTypeEnum.SEND
+        )
+        val (_, signature) = tx.sign(privateKey, true, chainId)
+        tx.sign = signature.toHex()
+
+        val hash = lattice.sendRawTBlock(tx)
+        val receipt = lattice.getReceipt(hash)
+        println(gson.toJson(receipt))
+    }
+}
+
+fun generateStringArr(len: Int): Array<String> {
+    return Array(len) { _ ->
+        "0x0c3505786be40e9cf488bce6b574346d72ddc58306092228f789b99ae04cfaa2"
+    }
+}
+
+fun generateDataId(): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    return "0x" + (1..64)
+        .map { chars.random() }
+        .joinToString("")
+}
+
+fun main() {
+    val addr = Address("zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi")
+    println(addr.toEthereumAddress())
 }
