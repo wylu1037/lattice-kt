@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.23'
     id 'io.spring.dependency-management' version "1.1.4"
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
+    id 'org.jetbrains.dokka' version '1.9.20'
 }
 
 group = 'com.example'
@@ -33,6 +34,7 @@ subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+    apply plugin: 'org.jetbrains.dokka'
 
     dependencyManagement {
         dependencies {
