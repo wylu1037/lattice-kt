@@ -10,5 +10,6 @@ dependencies {
             "com.google.code.gson:gson",
             "com.github.komputing.khex:extensions-jvm",
             "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+            "org.web3j:abi",
     )
 }

@@ -71,6 +71,11 @@ fun LatticeFunction.decode(rawCode: String): List<Type<*>> {
     return FunctionReturnDecoder.decode(rawCode, input)
 }
 
+fun LatticeFunction.decodeReturn(rawCode: String): List<Type<*>> {
+    val (_, output) = getTypeReferences()
+    return FunctionReturnDecoder.decode(rawCode, output)
+}
+
 
 /**
  * 获取 Abi 中方法的输入输出定义

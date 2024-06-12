@@ -14,6 +14,13 @@ data class EthereumAddress(private val input: String) {
     override fun hashCode(): Int = cleanHex.uppercase().hashCode()
 }
 
+/**
+ * 将以太坊地址转为ZLTC地址
+ */
+fun EthereumAddress.toAddress(prefix: String = "01"): Address {
+    return Address("$LATTICE_ADDRESS_PREFIX${Base58.check(hex, prefix)}")
+}
+
 data class Address(val input: String) {
     val cleanHex = input.removePrefix(LATTICE_ADDRESS_PREFIX)
 

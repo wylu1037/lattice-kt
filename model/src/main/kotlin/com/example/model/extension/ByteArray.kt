@@ -39,3 +39,13 @@ fun ByteArray.stripZeros(): ByteArray {
     while (start < size && this[start] == 0.toByte()) start++
     return this.copyOfRange(start, size)
 }
+
+fun ByteArray.toBytes32Array(): Array<String> {
+    val paddedArray = this.toTypedArray() + Array(32 - (size % 32)) { 0 }
+
+    return paddedArray.asSequence()
+        .chunked(32)
+        .map { it.toByteArray().toHexString() }
+        .toList()
+        .toTypedArray()
+}
