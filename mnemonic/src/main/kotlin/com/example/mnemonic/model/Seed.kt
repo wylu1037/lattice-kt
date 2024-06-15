@@ -23,22 +23,22 @@ value class Seed(val seed: ByteArray)
 fun Seed.toExtendedKey(publicKeyOnly: Boolean = false, isGM: Boolean = true, testnet: Boolean = false): ExtendedKey {
     try {
         val lr = CryptoAPI.hmac.init(BITCOIN_SEED).generate(seed)
-        val l = lr.copyOfRange(0, PRIVATE_KEY_SIZE)
-        val r = lr.copyOfRange(PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
-        val m = BigInteger(1, l)
-        
+        val skBytes = lr.copyOfRange(0, PRIVATE_KEY_SIZE)
+        val chaincode = lr.copyOfRange(PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
+        val m = BigInteger(1, skBytes)
+
         val curveParams = getCurveParams(if (isGM) sm2p256v1 else secp256k1)
         val curve = EllipticCurve(curveParams)
 
         if (m >= curve.n) {
             throw KeyException("Master key creation resulted in a key with higher modulus. Suggest deriving the next increment.")
         }
-        val keyPair = PrivateKey(l).toECKeyPair(isGM)
+        val keyPair = PrivateKey(skBytes).toECKeyPair(isGM)
         return if (publicKeyOnly) {
             val pubKeyPair = ECKeyPair(PrivateKey(BigInteger.ZERO), keyPair.publicKey)
-            ExtendedKey(pubKeyPair, r, 0, 0, 0, if (testnet) tpub else xpub)
+            ExtendedKey(pubKeyPair, chaincode, 0, 0, 0, if (testnet) tpub else xpub)
         } else {
-            ExtendedKey(keyPair, r, 0, 0, 0, if (testnet) tprv else xprv)
+            ExtendedKey(keyPair, chaincode, 0, 0, 0, if (testnet) tprv else xprv)
         }
     } catch (e: NoSuchAlgorithmException) {
         throw KeyException(e)

@@ -32,6 +32,25 @@ class MnemonicTest {
     }
 
     @Test
+    fun `derive for sm2p256v1`() {
+        val words = "potato front rug inquiry old author dose little still apart below develop"
+        val passphrase = "Root1234"
+        val mnemonic = Mnemonic(words)
+        val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/0", passphrase, true)
+        println(key.keyPair.privateKey.key.toHexString())
+    }
+
+    @Test
+    fun `derive for sm2p256v1 version2`() {
+        val words = "medal shed task apart range accident ride matrix fire citizen motion ridge"
+        val passphrase = "123"
+        val mnemonic = Mnemonic(words)
+        val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/2'/3'/4/5", passphrase, true)
+        val expected = "0xcd2e0330c22f7d8d38e22ad8df4d15824a7ba0ef7150f4dd777bf036fde64eed"
+        assertEquals(key.keyPair.privateKey.key.toHexString(), expected)
+    }
+
+    @Test
     fun `generate keypair for sm2p256v1`() {
         val isGM = true
         val mnemonic = Mnemonic.generate(128, Language.ZH_HANS)

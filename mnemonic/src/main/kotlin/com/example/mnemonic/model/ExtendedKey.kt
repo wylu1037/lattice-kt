@@ -138,13 +138,13 @@ fun ExtendedKey.generateChildKey(element: BIP44Element, isGM: Boolean = true): E
                 .put(pub)
                 .putInt(element.numberWithHardeningFlag)
                 .array()
-            if (isGM) extended[32] = 0
+            //if (isGM) extended[32] = 0
         }
         val lr = mac.generate(extended)
-        val l = lr.copyOfRange(0, PRIVATE_KEY_SIZE)
-        val r = lr.copyOfRange(PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
+        val skBytes = lr.copyOfRange(0, PRIVATE_KEY_SIZE)
+        val chaincode = lr.copyOfRange(PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
 
-        val m = BigInteger(1, l)
+        val m = BigInteger(1, skBytes)
 
         // 获取椭圆曲线参数
         val curveParams = getCurveParams(if (isGM) sm2p256v1 else secp256k1)
@@ -163,7 +163,7 @@ fun ExtendedKey.generateChildKey(element: BIP44Element, isGM: Boolean = true): E
             }
             ExtendedKey(
                 PrivateKey(k).toECKeyPair(isGM),
-                r,
+                chaincode,
                 (depth + 1).toByte(),
                 keyPair.computeFingerPrint(isGM),
                 element.numberWithHardeningFlag,
@@ -177,7 +177,7 @@ fun ExtendedKey.generateChildKey(element: BIP44Element, isGM: Boolean = true): E
             val curvePoint = curve.createPoint(q.x, q.y)
             ExtendedKey(
                 ECKeyPair(PrivateKey(BigInteger.ZERO), curvePoint.toPublicKey()),
-                r,
+                chaincode,
                 (depth + 1).toByte(),
                 keyPair.computeFingerPrint(isGM),
                 element.numberWithHardeningFlag,
