@@ -12,6 +12,7 @@ import com.example.rlp.toRLP
 import org.komputing.khex.extensions.toHexString
 import org.komputing.khex.model.HexString
 import java.math.BigInteger
+import java.time.Instant
 
 /**
  * 交易数据类
@@ -20,7 +21,7 @@ data class Transaction(
     var number: Long,
     var parentHash: String,
     var daemonHash: String,
-    var timestamp: Long,
+    var timestamp: Long = Instant.now().epochSecond,
     var owner: Address,
     var linker: Address? = Address(ZERO_LTC_ADDR),
     val type: TxTypeEnum,

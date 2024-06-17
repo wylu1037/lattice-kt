@@ -42,16 +42,13 @@ class LatticeTest {
     @Test
     fun `send transaction`() {
         val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
-        val tx = Transaction(
-            number = latestTBlock.currentTBlockNumber + 1,
-            parentHash = latestTBlock.currentTBlockHash,
-            daemonHash = latestTBlock.currentDBlockHash,
-            payload = "0x01",
-            timestamp = Instant.now().epochSecond,
-            owner = Address(ACCOUNT_ADDRESS_STR),
-            linker = Address(LINKER_ADDRESS_STR),
-            type = TxTypeEnum.SEND
-        )
+        val tx = TransferTXBuilder.builder()
+            .setBlock(latestTBlock)
+            .setPayload("0x01")
+            .setOwner(Address(ACCOUNT_ADDRESS_STR))
+            .setLinker(Address(LINKER_ADDRESS_STR))
+            .build()
+
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
@@ -143,17 +140,12 @@ class LatticeTest {
 
         file.printWriter().use { out ->
             for (i in 1..10000) {
-                val tx = Transaction(
-                    number = latestTBlock.currentTBlockNumber + 1,
-                    parentHash = latestTBlock.currentTBlockHash,
-                    daemonHash = latestTBlock.currentDBlockHash,
-                    payload = "0x01",
-
-                    timestamp = Instant.now().epochSecond,
-                    owner = Address(ACCOUNT_ADDRESS_STR),
-                    linker = Address(LINKER_ADDRESS_STR),
-                    type = TxTypeEnum.SEND
-                )
+                val tx = TransferTXBuilder.builder()
+                    .setBlock(latestTBlock)
+                    .setPayload("0x01")
+                    .setOwner(Address(ACCOUNT_ADDRESS_STR))
+                    .setLinker(Address(LINKER_ADDRESS_STR))
+                    .build()
                 val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
                 tx.sign = signature.toHex()
 
@@ -189,16 +181,13 @@ class LatticeTest {
 
                     file.printWriter().use { out ->
                         for (i in 1..count) {
-                            val tx = Transaction(
-                                number = latestTBlock.currentTBlockNumber + 1,
-                                parentHash = latestTBlock.currentTBlockHash,
-                                daemonHash = latestTBlock.currentDBlockHash,
-                                payload = "0x01",
-                                timestamp = Instant.now().epochSecond,
-                                owner = Address(account),
-                                linker = Address(LINKER_ADDRESS_STR),
-                                type = TxTypeEnum.SEND
-                            )
+                            val tx = TransferTXBuilder.builder()
+                                .setBlock(latestTBlock)
+                                .setPayload("0x01")
+                                .setOwner(Address(ACCOUNT_ADDRESS_STR))
+                                .setLinker(Address(LINKER_ADDRESS_STR))
+                                .build()
+
                             val (_, signature) = tx.sign(privateKeys[index], IS_GM, CHAIN_ID)
                             tx.sign = signature.toHex()
 
@@ -264,18 +253,15 @@ class LatticeTest {
         val accountAddress = "zltc_RzdiApWtmC2W5tDvdH6C9xcHs1cFcd2aq"
         val privateKey = "0x29cbd6aa68b56f1b6709ba89bed6529e3885ac37718938d84862518ecc43e607"
         val lattice: ILattice = Lattice(URL("http://192.168.1.115:13000"), chainId)
-        //val lattice: ILattice = Lattice(URL("http://192.168.1.115:13000"), chainId)
         val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(accountAddress))
-        val tx = Transaction(
-            number = latestTBlock.currentTBlockNumber + 1,
-            parentHash = latestTBlock.currentTBlockHash,
-            daemonHash = latestTBlock.currentDBlockHash,
-            payload = "0x01",
-            timestamp = Instant.now().epochSecond,
-            owner = Address(accountAddress),
-            linker = Address(LINKER_ADDRESS_STR),
-            type = TxTypeEnum.SEND
-        )
+
+        val tx = TransferTXBuilder.builder()
+            .setBlock(latestTBlock)
+            .setPayload("0x01")
+            .setOwner(Address(ACCOUNT_ADDRESS_STR))
+            .setLinker(Address(LINKER_ADDRESS_STR))
+            .build();
+ 
         val (_, signature) = tx.sign(privateKey, true, chainId)
         tx.sign = signature.toHex()
 
