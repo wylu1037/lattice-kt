@@ -1,6 +1,8 @@
 package com.example.abi
 
+import com.example.abi.model.IntNumber
 import com.example.abi.model.Types
+import com.example.abi.model.UintNumber
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -17,9 +19,7 @@ import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.*
 import org.web3j.abi.datatypes.Function
 import org.web3j.abi.datatypes.generated.Bytes32
-import org.web3j.abi.datatypes.generated.Uint64
 import org.web3j.protocol.core.methods.response.AbiDefinition
-import java.math.BigInteger
 
 object Json {
     val MAPPER: JsonMapper = JsonMapper.builder()
@@ -145,17 +145,23 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             return Address(addr)
         }
 
+
         type == Types.STRING.value -> Utf8String(
             arg as? String ?: throw IllegalArgumentException("Invalid argument type, String needs to be String")
         )
 
-        type == Types.UINT.value -> Uint(
-            arg as? BigInteger ?: throw IllegalArgumentException("Invalid argument type, Uint needs to be BigInteger")
-        )
+        SOL_TY_UINT_REGEX.toRegex().matches(type) -> {
+            val numStr = arg as? String
+                ?: throw IllegalArgumentException("Invalid argument type, Uint needs to be String")
 
-        type == Types.UINT64.value -> Uint64(
-            arg as? Long ?: throw IllegalArgumentException("Invalid argument type, Uint64 needs to be long")
-        )
+            return UintNumber(numStr.toBigInteger(), uintSize(type))
+        }
+
+        SOL_TY_INT_REGEX.toRegex().matches(type) -> {
+            val numStr = arg as? String
+                ?: throw IllegalArgumentException("Invalid argument type, Uint needs to be String")
+            return IntNumber(numStr.toBigInteger(), intSize(type))
+        }
 
         type == Types.BOOL.value -> Bool(
             arg as? Boolean ?: throw IllegalArgumentException("Invalid argument type, Bool needs to be Boolean")
@@ -214,3 +220,28 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         else -> return Utf8String(arg as String)
     }
 }
+
+
+/// 匹配 solidity 的byte1-byte32类型
+const val SOL_TY_BYTES_REGEX = "^(bytes)([1-9]*)$"
+
+/// 匹配 solidity 的uint uint1-uint256类型
+const val SOL_TY_UINT_REGEX = "^(uint)([1-9]*)$"
+
+/// 匹配 solidity 的int1-int256类型
+const val SOL_TY_INT_REGEX = "^(int)([1-9]*)$"
+
+/// 匹配 solidity 的 array 类型，Example: string[], bool[], bytes32[], uint256[]...
+const val SOL_TY_ARRAY_REGEX = "^([a-z1-9]+)(\\[([1-9]*)])$"
+
+
+fun uintSize(ty: String): Int {
+    val pattern = SOL_TY_UINT_REGEX.toRegex()
+    return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
+}
+
+fun intSize(ty: String): Int {
+    val pattern = SOL_TY_INT_REGEX.toRegex()
+    return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
+}
+
