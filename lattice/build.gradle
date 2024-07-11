@@ -11,5 +11,7 @@ dependencies {
             "com.github.komputing.khex:extensions-jvm",
             "org.jetbrains.kotlinx:kotlinx-coroutines-core",
             "org.web3j:abi",
+            "com.google.protobuf:protobuf-java-util",
+            "com.googlecode.protobuf-java-format:protobuf-java-format"
     )
 }

@@ -60,6 +60,9 @@ subprojects {
             dependency "com.squareup.okhttp3:okhttp:${okhttp3_version}"
             dependency "com.google.code.gson:gson:${gson_version}"
             dependency "org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlin_coroutines_version}"
+
+            dependency "com.google.protobuf:protobuf-java-util:3.25.0"
+            dependency "com.googlecode.protobuf-java-format:protobuf-java-format:1.4"
         }
     }
 
