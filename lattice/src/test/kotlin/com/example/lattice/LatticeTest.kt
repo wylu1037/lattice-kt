@@ -19,9 +19,9 @@ import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal const val ACCOUNT_ADDRESS_STR = "zltc_UXpJCXdhTkg6edriiaRUVkYgTfv2Z5npe"
+internal const val ACCOUNT_ADDRESS_STR = "zltc_mUQHC9ZCE8ZLH1uXLt38Ee9Y1atSu19YM"
 internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
-internal const val PRIVATE_KEY_HEX = "0x00a50da54a1987bf5ddd773e9c151bd40aa5d1281b8936dbdec93a9d0a04e4ca"
+internal const val PRIVATE_KEY_HEX = "0xb7534033e5b0468c88dbc62ca85809673367872193a3cfca7cb9e9224b98e015"
 internal const val IS_GM = true
 internal const val CHAIN_ID = 1
 internal const val HTTP_URL = "http://192.168.1.185:13000"
@@ -119,7 +119,7 @@ class LatticeTest {
             daemonHash = latestTBlock.currentDBlockHash,
             timestamp = Instant.now().epochSecond,
             owner = Address(ACCOUNT_ADDRESS_STR),
-            linker = Address("zltc_RvRUFNUYCg2vsjHii713Gc9Y3VNauM46J"),
+            linker = Address("zltc_dqUuNMBGSKWC6nquq18SNPRBftBp7Qm6g"),
             type = TxTypeEnum.EXECUTE,
             code = code
         )
@@ -260,8 +260,8 @@ class LatticeTest {
             .setPayload("0x01")
             .setOwner(Address(ACCOUNT_ADDRESS_STR))
             .setLinker(Address(LINKER_ADDRESS_STR))
-            .build();
- 
+            .build()
+
         val (_, signature) = tx.sign(privateKey, true, chainId)
         tx.sign = signature.toHex()
 
