@@ -28,6 +28,13 @@ object Compiler {
         return "${dir.toAbsolutePath()}${File.separator}$filename$DESC_SUFFIX"
     }
 
+    /**
+     * 编译proto文件为desc文件
+     *
+     * @param filename 文件名，示例：Student
+     * @param proto proto文件内容，示例："syntax = \"proto3\";\n\nmessage Student {\n\tstring id = 1;\n\tstring name = 2;\n}"
+     * @return String, desc文件的路径
+     */
     fun compile(filename: String, proto: String): String {
         val out = createDescOut(filename)
         val source = createProtoSource(filename, proto)
