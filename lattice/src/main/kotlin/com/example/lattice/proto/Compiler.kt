@@ -12,7 +12,7 @@ object Compiler {
     private const val DESC_SUFFIX = ".desc"
 
     private fun getCommand(out: String, source: String, filename: String): String {
-        val path = "protoc --descriptor_set_out=$out --proto_path=$source $filename"
+        val path = "protoc --descriptor_set_out=$out --proto_path=$source $source${File.separator}$filename"
         return path
     }
 
@@ -38,8 +38,8 @@ object Compiler {
     fun compile(filename: String, proto: String): String {
         val out = createDescOut(filename)
         val source = createProtoSource(filename, proto)
-        val runtime = Runtime.getRuntime()
         try {
+            val runtime = Runtime.getRuntime()
             val process = runtime.exec(getCommand(out, source, "$filename$PROTO_SUFFIX"))
             val code = process.waitFor()
             process.destroy()
