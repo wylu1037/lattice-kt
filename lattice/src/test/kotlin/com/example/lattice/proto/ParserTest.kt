@@ -24,3 +24,10 @@ class ParserTest {
         Files.deleteIfExists(Path.of(desc))
     }
 }
+
+fun main() {
+    val proto = "syntax = \"proto3\";\n\nmessage Student {\n\tint64 id = 1;\n\tstring name = 2;\n" +
+            "\tint32 grade = 3;\n}"
+    val protoName = proto.substring(proto.indexOf("message ") + 8, proto.indexOf(" {"))
+    println("protoName: {$protoName}_1")
+}
