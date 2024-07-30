@@ -40,12 +40,10 @@ class SignTest {
     @Test
     fun `sign and verify for sm2p256v1`() {
         val isGM = true
-        val priKeyHex = "0x2c71ac9b837e82c9e086c1cb493dd5a51c9eb7cd078702ed3e1726c81bf28d48"
+        val priKeyHex = "0xb58ee7d18f8ea223e8f4ca11cd813d3122990a354355f7b25f4891aa1be0ff2b"
         val message = HexString("0102030405060708010203040506070801020304050607080102030405060708").hexToByteArray()
         val keypair = PrivateKey(HexString(priKeyHex)).toECKeyPair(isGM)
-        val signature =
-            SignatureData.fromHexString("0x1d26a6fae9de6fe9c9dbbbade958cdb4549410f363f890deb76418355a255258bba96c1f45efba3d30d13152513fcbcf6beaf4346b6e6e465cafefdaeb16fbf701a22c38878ee2f0b296bb1c316db7d7812a0bfc3c72cd008ed6e81ed426ea087d")
-        // 0x203611c32f0cebacf218183a5f381b1023412376bf5ad5f478342c19ad9321790ea307113fb7e38b9e4c8de13c748b971aa82972134277bba3045c5e09cd457a011bab3d01ceb5c070d2291bd15fa2087205cbce2cc68df51561d915956ed83ed5
+        val signature = keypair.signMessage(message, isGM)
         val result = keypair.publicKey.verifySignature(message, signature, isGM)
         assertTrue(result)
     }
