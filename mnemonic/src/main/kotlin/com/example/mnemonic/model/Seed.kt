@@ -17,8 +17,25 @@ import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
 
 
-@JvmInline
-value class Seed(val seed: ByteArray)
+/**
+ * 种子
+ *
+ * @param seed
+ */
+data class Seed(val seed: ByteArray) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Seed
+
+        return seed.contentEquals(other.seed)
+    }
+
+    override fun hashCode(): Int {
+        return seed.contentHashCode()
+    }
+}
 
 fun Seed.toExtendedKey(publicKeyOnly: Boolean = false, isGM: Boolean = true, testnet: Boolean = false): ExtendedKey {
     try {

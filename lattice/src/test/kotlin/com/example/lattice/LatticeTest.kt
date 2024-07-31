@@ -10,6 +10,7 @@ import com.example.lattice.provider.HttpApiImpl
 import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
 import com.example.model.*
+import com.example.model.Address
 import com.example.model.extension.toBytes32Array
 import com.example.model.extension.toHexString
 import kotlinx.coroutines.Deferred
@@ -316,7 +317,7 @@ class LatticeTest {
         assertNotNull(receipt)
         assertEquals(receipt.success, true)
 
-        println("业务合约地址：${EthereumAddress(receipt.contractRet).toAddress().hex}")
+        println("业务合约地址：${EthereumAddress(receipt.contractRet).toAddress().address}")
     }
 }
 

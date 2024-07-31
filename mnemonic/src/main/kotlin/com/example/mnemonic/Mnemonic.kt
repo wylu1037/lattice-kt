@@ -10,8 +10,7 @@ import java.security.SecureRandom
 /**
  * 助记词
  */
-@JvmInline
-value class Mnemonic(val phrase: String) {
+data class Mnemonic(val phrase: String) {
     companion object {
         /**
          * Generates a mnemonic phrase, given a desired [strength]
@@ -21,6 +20,7 @@ value class Mnemonic(val phrase: String) {
          * @param lang 语言
          * @return 助记词
          */
+        @JvmStatic
         fun generate(strength: Int = 128, lang: Language = Language.ZH_HANS): Mnemonic {
             require(strength % 32 == 0) { "The entropy strength needs to be a multiple of 32" }
 
@@ -37,8 +37,20 @@ value class Mnemonic(val phrase: String) {
 /**
  * 熵
  */
-@JvmInline
-value class Entropy(val entropy: ByteArray)
+data class Entropy(val entropy: ByteArray) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Entropy
+
+        return entropy.contentEquals(other.entropy)
+    }
+
+    override fun hashCode(): Int {
+        return entropy.contentHashCode()
+    }
+}
 
 fun Mnemonic.toMnemonicWords() = MnemonicWords(
     phrase.trim().lowercase().split(" ")

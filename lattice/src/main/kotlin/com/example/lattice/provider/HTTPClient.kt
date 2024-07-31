@@ -150,7 +150,7 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
     }
 
     override fun getBalanceWithPending(address: Address): Balance {
-        return sendUseJsonRpc("latc_getBalanceWithPending", arrayOf(address.hex))
+        return sendUseJsonRpc("latc_getBalanceWithPending", arrayOf(address.address))
     }
 
     override fun getGenesis(): TBlock {
@@ -158,7 +158,7 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
     }
 
     override fun getCurrentTDBlock(address: Address): CurrentTDBlock {
-        return sendUseJsonRpc("latc_getCurrentTBDB", arrayOf(address.hex))
+        return sendUseJsonRpc("latc_getCurrentTBDB", arrayOf(address.address))
     }
 
     override fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock {

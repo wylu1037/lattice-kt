@@ -80,7 +80,7 @@ class MnemonicTest {
         val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/1", "Root1234", isGM)
         val privateKey = key.keyPair.privateKey.key.toHexString()
         val publicKey = key.keyPair.getCompressedPublicKey(isGM).toHexString()
-        val address = key.keyPair.toAddress(isGM).hex
+        val address = key.keyPair.toAddress(isGM).address
 
         assertEquals("0x93e19bbaf5263b996d946bf3a82f72a221ccf8c2809653b74b4bf7e9802e62e0", privateKey)
         assertEquals("0x032177edf9019a1688439547f6e41efb0bbef34adb11278d8e4c55869798d24cb2", publicKey)
@@ -94,7 +94,7 @@ class MnemonicTest {
         val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/0", "Root1234", isGM)
         val privateKey = key.keyPair.privateKey.key.toHexString()
         val publicKey = key.keyPair.getCompressedPublicKey(isGM).toHexString()
-        val address = key.keyPair.toAddress(isGM).hex
+        val address = key.keyPair.toAddress(isGM).address
 
         assertEquals("0x3aa1180b5036f8f965159a8528454da137f2ae844695ae3e5e1b983a9acc3dcb", privateKey)
         assertEquals("0x03ca7d3d6edee763c83375e596617600c477961aecf8d0533aeaa744fb176a8237", publicKey)
