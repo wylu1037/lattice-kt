@@ -16,6 +16,25 @@ import java.time.Instant
 
 /**
  * 交易数据类
+ *
+ * @property number 账户高度
+ * @property parentHash 父交易哈希
+ * @property daemonHash 守护区块哈希
+ * @property timestamp 构造交易的时间戳(秒)
+ * @property owner 己方地址
+ * @property linker 对方地址，一般为账户地址或合约地址
+ * @property type 交易类型 [TxTypeEnum]
+ * @property hub 引用的交易哈希，一般用于接收交易时使用
+ * @property code 合约code
+ * @property codeHash 合约code的哈希
+ * @property payload 交易备注，为0x前缀的16进制字符串
+ * @property amount 转账的通证数量，整数
+ * @property income 激励
+ * @property joule 消耗的手续费
+ * @property sign 交易的签名
+ * @property proofOfWork 已废弃
+ * @property version 交易版本 [VersionEnum]
+ * @property difficulty 难度
  */
 data class Transaction(
     var number: Long,
@@ -45,6 +64,8 @@ data class Transaction(
  * @param isGM sm2p256v1 or secp256k1
  * @param chainId 区块链ID
  * @param useProofOfWork 默认false
+ * @return Pair<pow, signature> [Pair]
+ * @see SignatureData
  */
 fun Transaction.sign(
     privateKey: String,
@@ -63,7 +84,7 @@ fun Transaction.sign(
  * @param isGM sm2p256v1 or secp256k1
  * @param chainId 区块链ID
  * @param useProofOfWork 默认false
- * @return Pair<pow,hash>
+ * @return Pair<pow, hash> [Pair]
  */
 @OptIn(ExperimentalStdlibApi::class)
 fun Transaction.hash(isGM: Boolean = true, chainId: Int = 1, useProofOfWork: Boolean = false): Pair<String, ByteArray> {
@@ -145,6 +166,8 @@ fun Transaction.hashSeal(
 
 /**
  * convert Transaction to SendTBlock
+ *
+ * @return [SendTBlock]
  */
 fun Transaction.toSendTBlock() = SendTBlock(
     number,

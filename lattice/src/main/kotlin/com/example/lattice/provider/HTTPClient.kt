@@ -74,31 +74,31 @@ interface HttpApi {
     /**
      * 获取包括pending状态在内的账户余额
      *
-     * @param address 账户地址
-     * @return 余额
+     * @param address 账户地址 [Address]
+     * @return [Balance] 余额
      */
     fun getBalanceWithPending(address: Address): Balance
 
     /**
      * 获取创世区块
      *
-     * @return 创建区块
+     * @return 创建区块 [TBlock]
      */
     fun getGenesis(): TBlock
 
     /**
      * 获取账户最新的区块信息
      *
-     * @param address 账户地址
-     * @return 区块信息
+     * @param address 账户地址 [Address]
+     * @return 区块信息 [CurrentTDBlock]
      */
     fun getCurrentTDBlock(address: Address): CurrentTDBlock
 
     /**
      * 获取账户最新的区块信息，失败则获取创世区块信息
      *
-     * @param address 账户地址
-     * @return 区块信息
+     * @param address 账户地址 [Address]
+     * @return [CurrentTDBlock] 区块信息
      */
     fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock
 
@@ -114,9 +114,17 @@ interface HttpApi {
      * 获取交易的回执信息
      *
      * @param hash 交易哈希
-     * @return 回执
+     * @return [Receipt] 交易回执
      */
     fun getReceipt(hash: String): Receipt
+
+    /**
+     * 预执行合约
+     *
+     * @param unsignedTx 未签名的交易 [Transaction]
+     * @return 交易回执 [Receipt]
+     */
+    fun preExecuteContract(unsignedTx: Transaction): Receipt
 }
 
 
@@ -178,5 +186,9 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
 
     override fun getReceipt(hash: String): Receipt {
         return sendUseJsonRpc("latc_getReceipt", arrayOf(hash))
+    }
+
+    override fun preExecuteContract(unsignedTx: Transaction): Receipt {
+        return sendUseJsonRpc("wallet_preExecuteContract", arrayOf(unsignedTx.toSendTBlock()))
     }
 }
