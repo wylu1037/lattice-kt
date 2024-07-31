@@ -25,8 +25,7 @@ enum class Protocol {
     HTTP, WS, UNKNOWN
 }
 
-@JvmInline
-value class URL(val value: String)
+data class URL(val value: String)
 
 /**
  * 初始化一个客户端
@@ -41,6 +40,7 @@ fun URL.newClient(): Client {
     }
 }
 
+// fixme
 fun URL.detectProtocol(): Protocol {
     if ("^(http(s)?://)\\w+\\S+(\\.\\S+)+$".toRegex().matches(value)) {
         return HTTP

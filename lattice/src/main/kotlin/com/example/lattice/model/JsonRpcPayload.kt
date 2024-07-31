@@ -1,10 +1,12 @@
 package com.example.lattice.model
 
+private const val version = "2.0"
+
 typealias JsonRpcIdentifier = String
 typealias JsonRpcId = Int
 
 data class JsonRpcPayload(
-    val jsonRpc: JsonRpcIdentifier = "2.0",
+    val jsonRpc: JsonRpcIdentifier = version,
     val id: JsonRpcId = 1,
     val method: String,
     val params: Array<Any>
@@ -30,4 +32,13 @@ data class JsonRpcPayload(
         result = 31 * result + params.contentHashCode()
         return result
     }
+}
+
+fun JsonRpcPayload.toBody(): Map<String, Any> {
+    return mapOf(
+        "id" to id,
+        "jsonRpc" to jsonRpc,
+        "method" to method,
+        "params" to params
+    )
 }

@@ -5,6 +5,9 @@ import com.example.abi.decodeReturn
 import com.example.abi.encode
 import com.example.abi.getFunction
 import com.example.lattice.model.*
+import com.example.lattice.provider.HttpApi
+import com.example.lattice.provider.HttpApiImpl
+import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
 import com.example.model.*
 import com.example.model.extension.toBytes32Array
@@ -19,9 +22,9 @@ import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal const val ACCOUNT_ADDRESS_STR = "zltc_mUQHC9ZCE8ZLH1uXLt38Ee9Y1atSu19YM"
+internal const val ACCOUNT_ADDRESS_STR = "zltc_dS73XWcJqu2uEk4cfWsX8DDhpb9xsaH9s"
 internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
-internal const val PRIVATE_KEY_HEX = "0xb7534033e5b0468c88dbc62ca85809673367872193a3cfca7cb9e9224b98e015"
+internal const val PRIVATE_KEY_HEX = "0xdbd91293f324e5e49f040188720c6c9ae7e6cc2b4c5274120ee25808e8f4b6a7"
 internal const val IS_GM = true
 internal const val CHAIN_ID = 1
 internal const val HTTP_URL = "http://192.168.1.185:13000"
@@ -31,17 +34,17 @@ internal const val LEDGER_ABI =
 
 class LatticeTest {
 
-    private val lattice: ILattice = Lattice(URL(HTTP_URL), CHAIN_ID)
+    private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(HTTP_URL), CHAIN_ID))
 
     @Test
     fun `get balance`() {
-        val balance = lattice.getBalanceWithPending(Address(ACCOUNT_ADDRESS_STR))
+        val balance = httpApi.getBalanceWithPending(Address(ACCOUNT_ADDRESS_STR))
         println(gson.toJson(balance))
     }
 
     @Test
-    fun `send transaction`() {
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+    fun `transfer with payload`() {
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val tx = TransferTXBuilder.builder()
             .setBlock(latestTBlock)
             .setPayload("0x01")
@@ -52,8 +55,8 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
-        val receipt = lattice.getReceipt(hash)
+        val hash = httpApi.sendRawTBlock(tx)
+        val receipt = httpApi.getReceipt(hash)
         println(gson.toJson(receipt))
     }
 
@@ -62,7 +65,7 @@ class LatticeTest {
         val bytecode =
             "0x60806040526000805534801561001457600080fd5b50610278806100246000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80635b34b96614610046578063a87d942c14610050578063f5c5ad831461006e575b600080fd5b61004e610078565b005b610058610093565b60405161006591906100d0565b60405180910390f35b61007661009c565b005b600160008082825461008a919061011a565b92505081905550565b60008054905090565b60016000808282546100ae91906101ae565b92505081905550565b6000819050919050565b6100ca816100b7565b82525050565b60006020820190506100e560008301846100c1565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610125826100b7565b9150610130836100b7565b9250817f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0383136000831215161561016b5761016a6100eb565b5b817f80000000000000000000000000000000000000000000000000000000000000000383126000831216156101a3576101a26100eb565b5b828201905092915050565b60006101b9826100b7565b91506101c4836100b7565b9250827f8000000000000000000000000000000000000000000000000000000000000000018212600084121516156101ff576101fe6100eb565b5b827f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff018213600084121615610237576102366100eb565b5b82820390509291505056fea2646970667358221220d841351625356129f6266ada896818d690dbc4b0d176774a97d745dfbe2fe50164736f6c634300080b0033"
 
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val tx = Transaction(
             number = latestTBlock.currentTBlockNumber + 1,
             parentHash = latestTBlock.currentTBlockHash,
@@ -76,8 +79,8 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
-        val receipt = lattice.getReceipt(hash)
+        val hash = httpApi.sendRawTBlock(tx)
+        val receipt = httpApi.getReceipt(hash)
         println(gson.toJson(receipt))
     }
 
@@ -85,7 +88,7 @@ class LatticeTest {
     fun `execute contract increment counter`() {
         val abi =
             "[{\"inputs\":[],\"name\":\"decrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCount\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"incrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val method = "incrementCounter"
         val code = LatticeAbi(abi).getFunction(method).encode(arrayOf())
         val tx = Transaction(
@@ -101,8 +104,8 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
-        val receipt = lattice.getReceipt(hash)
+        val hash = httpApi.sendRawTBlock(tx)
+        val receipt = httpApi.getReceipt(hash)
         println(gson.toJson(receipt))
     }
 
@@ -110,7 +113,7 @@ class LatticeTest {
     fun `execute contract get counter`() {
         val abi =
             "[{\"inputs\":[],\"name\":\"decrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCount\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"incrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val method = "getCount"
         val code = LatticeAbi(abi).getFunction(method).encode(arrayOf())
         val tx = Transaction(
@@ -126,14 +129,14 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
-        val receipt = lattice.getReceipt(hash)
+        val hash = httpApi.sendRawTBlock(tx)
+        val receipt = httpApi.getReceipt(hash)
         println(gson.toJson(receipt))
     }
 
     @Test
     fun `build payload tx`() {
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val filePath = "./data.txt"
         val file = File(filePath)
         if (!file.exists()) file.createNewFile()
@@ -177,7 +180,7 @@ class LatticeTest {
                     val file = File("./data$index.txt")
                     if (!file.exists()) file.createNewFile()
 
-                    val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(account))
+                    val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(account))
 
                     file.printWriter().use { out ->
                         for (i in 1..count) {
@@ -212,7 +215,7 @@ class LatticeTest {
     fun `execute contract`() {
         val abi =
             "[{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolSuite\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"addProtocol\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"name\":\"getAddress\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Protocol[]\",\"name\":\"protocol\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"updateProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"getTraceability\",\"outputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"number\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"protocol\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Evidence[]\",\"name\":\"evi\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"writeTraceability\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"internalType\":\"struct Business.batch[]\",\"name\":\"bt\",\"type\":\"tuple[]\"}],\"name\":\"writeTraceabilityBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
         val method = "writeTraceability"
 
         val times = 1000
@@ -239,40 +242,16 @@ class LatticeTest {
             val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
             tx.sign = signature.toHex()
 
-            val hash = lattice.sendRawTBlock(tx)
+            val hash = httpApi.sendRawTBlock(tx)
             println("交易哈希：$hash")
-            val receipt = lattice.getReceipt(hash)
+            val receipt = httpApi.getReceipt(hash)
             println("交易回执：${gson.toJson(receipt)}")
         }
     }
 
-
-    @Test
-    fun `send transaction temp`() {
-        val chainId = 1
-        val accountAddress = "zltc_RzdiApWtmC2W5tDvdH6C9xcHs1cFcd2aq"
-        val privateKey = "0x29cbd6aa68b56f1b6709ba89bed6529e3885ac37718938d84862518ecc43e607"
-        val lattice: ILattice = Lattice(URL("http://192.168.1.115:13000"), chainId)
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(accountAddress))
-
-        val tx = TransferTXBuilder.builder()
-            .setBlock(latestTBlock)
-            .setPayload("0x01")
-            .setOwner(Address(ACCOUNT_ADDRESS_STR))
-            .setLinker(Address(LINKER_ADDRESS_STR))
-            .build()
-
-        val (_, signature) = tx.sign(privateKey, true, chainId)
-        tx.sign = signature.toHex()
-
-        val hash = lattice.sendRawTBlock(tx)
-        val receipt = lattice.getReceipt(hash)
-        println(gson.toJson(receipt))
-    }
-
     @Test
     fun `create protocol`() {
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
 
         val protocolSuite = 10L
         val protocol = "syntax = \"proto3\";\n\nmessage Student {\n\tfloat id = 1;\n}"
@@ -298,12 +277,12 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
+        val hash = httpApi.sendRawTBlock(tx)
         println("创建协议哈希：$hash")
 
         Thread.sleep(1_000)
 
-        val receipt = lattice.getReceipt(hash)
+        val receipt = httpApi.getReceipt(hash)
         assertNotNull(receipt)
         assertEquals(receipt.success, true)
 
@@ -313,7 +292,7 @@ class LatticeTest {
 
     @Test
     fun `creat business`() {
-        val latestTBlock = lattice.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
 
         val tx = Transaction(
             number = latestTBlock.currentTBlockNumber + 1,
@@ -328,12 +307,12 @@ class LatticeTest {
         val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
         tx.sign = signature.toHex()
 
-        val hash = lattice.sendRawTBlock(tx)
+        val hash = httpApi.sendRawTBlock(tx)
         println("创建业务地址哈希：$hash")
 
         Thread.sleep(1_000)
 
-        val receipt = lattice.getReceipt(hash)
+        val receipt = httpApi.getReceipt(hash)
         assertNotNull(receipt)
         assertEquals(receipt.success, true)
 
