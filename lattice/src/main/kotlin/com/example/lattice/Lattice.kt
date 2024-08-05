@@ -16,6 +16,8 @@ internal val gson by lazy {
 }
 
 
+const val ZERO_ADDRESS = "zltc_QLbz7JHiBTspS962RLKV8GndWFwjA5K66"
+
 enum class Curve {
     Sm2p256v1,
     Secp256k1
@@ -87,6 +89,10 @@ interface Lattice {
     fun transfer(linker: String, payload: String, amount: Long = 0, joule: Long = 0): String
 
     fun transferWaitReceipt(linker: String, payload: String, amount: Long = 0, joule: Long = 0): Receipt
+
+    fun deployContract(data: String, payload: String, amount: Long = 0, joule: Long = 0): String
+
+    fun callContract(contractAddress: String, data: String, payload: String, amount: Long = 0, joule: Long = 0): String
 }
 
 class LatticeImpl(
@@ -122,6 +128,34 @@ class LatticeImpl(
     }
 
     override fun transferWaitReceipt(linker: String, payload: String, amount: Long, joule: Long): Receipt {
+        TODO("Not yet implemented")
+    }
+
+    override fun deployContract(data: String, payload: String, amount: Long, joule: Long): String {
+        val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
+        val transaction = DeployContractTXBuilder.builder()
+            .setBlock(block)
+            .setOwner(Address(_credentialConfig.accountAddress))
+            .setLinker(Address(ZERO_ADDRESS))
+            .setCode(data)
+            .setPayload(payload)
+            .setAmount(amount)
+            .setJoule(joule)
+            .build()
+
+        val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
+        transaction.sign = signature.toHex()
+
+        return _httpApi.sendRawTBlock(transaction)
+    }
+
+    override fun callContract(
+        contractAddress: String,
+        data: String,
+        payload: String,
+        amount: Long,
+        joule: Long
+    ): String {
         TODO("Not yet implemented")
     }
 }

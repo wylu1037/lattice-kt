@@ -9,4 +9,15 @@ data class CurrentTDBlock(
     var currentDBlockHash: String,
     var currentTBlockHash: String,
     var currentTBlockNumber: Long
-)
+) {
+    companion object {
+        @JvmStatic
+        fun zeroBlock(): CurrentTDBlock {
+            return CurrentTDBlock(
+                currentDBlockHash = "0x0000000000000000000000000000000000000000000000000000000000000000",
+                currentTBlockHash = "0x0000000000000000000000000000000000000000000000000000000000000000",
+                currentTBlockNumber = 0L
+            )
+        }
+    }
+}

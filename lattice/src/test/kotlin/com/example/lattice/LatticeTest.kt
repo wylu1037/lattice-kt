@@ -10,6 +10,7 @@ import com.example.lattice.provider.HttpApiImpl
 import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
 import com.example.model.*
+import com.example.model.block.CurrentTDBlock
 import com.example.model.extension.toBytes32Array
 import com.example.model.extension.toHexString
 import kotlinx.coroutines.Deferred
@@ -88,7 +89,8 @@ class LatticeTest {
     fun `execute contract increment counter`() {
         val abi =
             "[{\"inputs\":[],\"name\":\"decrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCount\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"incrementCounter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-        val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        // val latestTBlock = httpApi.getLatestTDBlockWithCatch(Address(ACCOUNT_ADDRESS_STR))
+        val latestTBlock = CurrentTDBlock.zeroBlock()
         val method = "incrementCounter"
         val code = LatticeAbi(abi).getFunction(method).encode(arrayOf())
         val tx = Transaction(

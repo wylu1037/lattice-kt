@@ -64,13 +64,19 @@ fun post(request: BaseRequest): Response {
  * @param chainId 链ID
  * @param token jwt token
  */
-data class HttpApiParams(val url: URL, val chainId: Int, val token: String? = null)
+data class HttpApiParams(val url: URL, val chainId: Int, var token: String? = null)
 
 fun HttpApiParams.chainIdAsString(): String {
     return chainId.toString()
 }
 
 interface HttpApi {
+    /**
+     * 刷新token
+     * @param newToken 刷新的token
+     */
+    fun refreshToken(newToken: String)
+
     /**
      * 获取包括pending状态在内的账户余额
      *
@@ -153,6 +159,10 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         return jsonRpcResponse.result?.takeIf {
             jsonRpcResponse.error == null
         } ?: throw Error(jsonRpcResponse.error?.message ?: "Empty result.")
+    }
+
+    override fun refreshToken(newToken: String) {
+        _params.token = newToken
     }
 
     override fun getBalanceWithPending(address: Address): Balance {
