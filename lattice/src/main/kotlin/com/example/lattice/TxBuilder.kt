@@ -21,6 +21,10 @@ interface TransactionBuilder {
 
     fun setLinker(linker: Address): TransactionBuilder
 
+    fun setAmount(amount: Long): TransactionBuilder
+
+    fun setJoule(joule: Long): TransactionBuilder
+
     fun refreshTimestamp(): TransactionBuilder
 }
 
@@ -61,6 +65,16 @@ class TransferTXBuilder : TransactionBuilder {
 
     override fun setLinker(linker: Address): TransferTXBuilder {
         tx.linker = linker
+        return this
+    }
+
+    override fun setAmount(amount: Long): TransactionBuilder {
+        tx.amount = amount
+        return this
+    }
+
+    override fun setJoule(joule: Long): TransactionBuilder {
+        tx.joule = joule
         return this
     }
 

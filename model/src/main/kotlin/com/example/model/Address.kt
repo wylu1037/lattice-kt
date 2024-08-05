@@ -38,7 +38,7 @@ fun EthereumAddress.toAddress(prefix: String = "01"): Address {
 /**
  * ZLTC地址
  *
- * @param addr zltc地址，示例：zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi
+ * @property addr zltc地址，示例：zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi
  */
 data class Address(val addr: String) {
     init {

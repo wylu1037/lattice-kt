@@ -92,7 +92,7 @@ interface HttpApi {
      * @param address 账户地址 [Address]
      * @return 区块信息 [CurrentTDBlock]
      */
-    fun getCurrentTDBlock(address: Address): CurrentTDBlock
+    fun getLatestBlock(address: Address): CurrentTDBlock
 
     /**
      * 获取账户最新的区块信息，失败则获取创世区块信息
@@ -165,13 +165,13 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         return sendUseJsonRpc("latc_getGenesis", emptyArray())
     }
 
-    override fun getCurrentTDBlock(address: Address): CurrentTDBlock {
+    override fun getLatestBlock(address: Address): CurrentTDBlock {
         return sendUseJsonRpc("latc_getCurrentTBDB", arrayOf(address.address))
     }
 
     override fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock {
         return try {
-            getCurrentTDBlock(address)
+            getLatestBlock(address)
         } catch (e: Error) {
             getGenesis().toCurrentTDBlock()
         }
