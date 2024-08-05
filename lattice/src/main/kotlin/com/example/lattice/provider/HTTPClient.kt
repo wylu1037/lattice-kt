@@ -150,11 +150,9 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         val response = _client.send(JsonRpcPayload(method = method, params = params), headers)
         val type = TypeToken.getParameterized(JsonRpcResponse::class.java, T::class.java).type
         val jsonRpcResponse = gson.fromJson<JsonRpcResponse<T>>(response, type)
-        return jsonRpcResponse.result?.also {
-            if (jsonRpcResponse.error != null) {
-                throw Error(jsonRpcResponse.error.message)
-            }
-        } ?: throw Error("Empty result.")
+        return jsonRpcResponse.result?.takeIf {
+            jsonRpcResponse.error == null
+        } ?: throw Error(jsonRpcResponse.error?.message ?: "Empty result.")
     }
 
     override fun getBalanceWithPending(address: Address): Balance {
