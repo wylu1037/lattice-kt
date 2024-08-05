@@ -7,15 +7,21 @@
     <a href="wasm">wasm</a>
 </p>
 
-<h1>简介</h1>
-Kotlin 语言版本的链 SDK。
+<h1>Intro</h1>
+Blockchain sdk that written in Kotlin programming language.
+
+## Tech stack
+
+- [x] [Retry](https://github.com/michaelbull/kotlin-retry) A multiplatform higher-order function for retrying operations
+  that may fail.
 
 <h1 id="WebAssembly ">WebAssembly</h1>
-WASM
 
-<h1>计划</h1>
+[WASM](https://kotlinlang.org/docs/wasm-overview.html)
 
-- [ ] [Cli](https://github.com/Kotlin/kotlinx-cli)
+<h1>Plan</h1>
+
+- [ ] [Cli](https://github.com/Kotlin/kotlinx-cli) Pure Kotlin implementation of a generic CLI parser.
 
 <h1>Docs</h1>
 <h2>use docker</h2>
