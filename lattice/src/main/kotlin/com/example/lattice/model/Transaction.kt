@@ -33,7 +33,7 @@ import java.time.Instant
  * @property joule 消耗的手续费
  * @property sign 交易的签名
  * @property proofOfWork 已废弃
- * @property version 交易版本 [VersionEnum]
+ * @property version 交易版本 [TxVersionEnum]
  * @property difficulty 难度
  */
 data class Transaction(
@@ -53,7 +53,7 @@ data class Transaction(
     var joule: Long = 0,
     var sign: String? = null,
     var proofOfWork: String? = null,
-    var version: Int = VersionEnum.LATEST.version(),
+    var version: Int = TxVersionEnum.LATEST.version(),
     var difficulty: Int? = 0
 )
 

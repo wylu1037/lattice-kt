@@ -1,7 +1,7 @@
 package com.example.lattice.model
 
 import com.example.lattice.model.TxTypeEnum.*
-import com.example.lattice.model.VersionEnum.*
+import com.example.lattice.model.TxVersionEnum.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 internal val APPLICATION_JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
@@ -37,14 +37,14 @@ fun TxTypeEnum.type() = name.lowercase()
  * @property NUWA 女娲
  * @property LATEST 最新版本
  */
-enum class VersionEnum {
+enum class TxVersionEnum {
     CHAOS,
     PANGU,
     NUWA,
     LATEST
 }
 
-fun VersionEnum.version() = ordinal
+fun TxVersionEnum.version() = ordinal
 
 internal const val DIFFICULTY = 12
 const val ZERO_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000"

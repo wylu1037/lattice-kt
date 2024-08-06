@@ -6,8 +6,10 @@ import com.example.model.Address
 import com.example.model.block.CurrentTDBlock
 import java.time.Instant
 
-// 建造者模式
-// Design: See https://refactoringguru.cn/design-patterns/builder
+/**
+ * 交易的建造者模式
+ * Design: See https://refactoringguru.cn/design-patterns/builder
+ */
 interface TransactionBuilder<T : TransactionBuilder<T>> {
     fun build(): Transaction
 
@@ -28,6 +30,11 @@ interface TransactionBuilder<T : TransactionBuilder<T>> {
     fun refreshTimestamp(): T
 }
 
+/**
+ * 交易的建造者抽象类
+ *
+ * @param type[TxTypeEnum] 交易的类型枚举
+ */
 abstract class BaseTransactionBuilder<T : BaseTransactionBuilder<T>>(type: TxTypeEnum) :
     TransactionBuilder<T> {
 
