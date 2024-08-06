@@ -130,7 +130,7 @@ interface HttpApi {
      * @param unsignedTx 未签名的交易 [Transaction]
      * @return 交易回执 [Receipt]
      */
-    fun preExecuteContract(unsignedTx: Transaction): Receipt
+    fun preCallContract(unsignedTx: Transaction): Receipt
 }
 
 
@@ -196,7 +196,7 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         return sendUseJsonRpc("latc_getReceipt", arrayOf(hash))
     }
 
-    override fun preExecuteContract(unsignedTx: Transaction): Receipt {
+    override fun preCallContract(unsignedTx: Transaction): Receipt {
         return sendUseJsonRpc("wallet_preExecuteContract", arrayOf(unsignedTx.toSendTBlock()))
     }
 }

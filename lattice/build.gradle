@@ -12,6 +12,7 @@ dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-core",
             "org.web3j:abi",
             "com.google.protobuf:protobuf-java-util",
-            "com.googlecode.protobuf-java-format:protobuf-java-format"
+            "com.googlecode.protobuf-java-format:protobuf-java-format",
+            "com.michael-bull.kotlin-retry:kotlin-retry",
     )
 }
