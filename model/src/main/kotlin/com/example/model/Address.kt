@@ -7,7 +7,7 @@ package com.example.model
  */
 data class EthereumAddress(private val addr: String) {
     init {
-        require(!addr.matches(Regex(RegExpr.ETHEREUM_ADDRESS))) {
+        require(addr.matches(Regex(RegExpr.ETHEREUM_ADDRESS))) {
             "Invalid address: $addr, Example: 0x5f2be9a02b43f748ee460bf36eed24fafa109920"
         }
     }

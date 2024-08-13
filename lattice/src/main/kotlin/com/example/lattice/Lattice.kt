@@ -49,8 +49,8 @@ data class ConnectingNodeConfig(val url: String)
  */
 data class CredentialConfig(val accountAddress: String, val privateKey: String, val passphrase: String? = null) {
     init {
-        require(!accountAddress.matches(Regex(RegExpr.ADDRESS))) { "Invalid account address." }
-        require(!privateKey.matches(Regex(RegExpr.PRIVATE_KEY_HEX))) { "Invalid private key." }
+        require(accountAddress.matches(Regex(RegExpr.ADDRESS))) { "Invalid account address." }
+        require(privateKey.matches(Regex(RegExpr.PRIVATE_KEY_HEX))) { "Invalid private key." }
     }
 }
 
