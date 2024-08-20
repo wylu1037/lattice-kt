@@ -54,7 +54,7 @@ class LatticeTest {
     @Test
     fun `transfer wait receipt`() {
         val receipt = lattice.transferWaitReceipt("zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD", "0x01")
-        println(gson.toJson(receipt))
+        assertNotNull(receipt)
     }
 
     @Test

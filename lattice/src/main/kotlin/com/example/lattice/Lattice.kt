@@ -19,6 +19,9 @@ import com.github.michaelbull.retry.policy.decorrelatedJitterBackoff
 import com.github.michaelbull.retry.retry
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+
+var logger = LoggerFactory.getLogger("Lattice")
 
 internal val gson by lazy {
     Gson()
@@ -252,6 +255,7 @@ class LatticeImpl(
     private val _httpApi = HttpApiImpl(HttpApiParams(URL(_connectingNodeConfig.url), chainConfig.chainId))
 
     override fun transfer(linker: String, payload: String, amount: Long, joule: Long): String {
+        logger.debug("开始发起转账交易，linker: {}, payload: {}, amount: {}, joule: {}", linker, payload, amount, joule)
         val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
         val transaction = TransferTXBuilder.builder()
             .setBlock(block)
@@ -265,7 +269,9 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        return _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(transaction)
+        logger.debug("结束转账交易，交易哈希为：{}", hash)
+        return hash
     }
 
     override fun transferWaitReceipt(
@@ -277,11 +283,13 @@ class LatticeImpl(
     ): Receipt {
         val hash = transfer(linker, payload, amount, joule)
 
+        logger.debug("获取交易【{}】的回执", hash)
         val receipt = runBlocking {
             retry(retryPolicy) {
                 _httpApi.getReceipt(hash)
             }
         }
+        logger.debug("获取到交易【{}】的回执为：{}", hash, gson.toJson(receipt))
         return receipt
     }
 

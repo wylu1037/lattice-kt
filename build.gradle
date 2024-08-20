@@ -29,6 +29,8 @@ ext {
     gson_version = "2.8.9"
     kotlin_coroutines_version = "1.8.1"
     retry_version = "2.0.1"
+    slf4j_version = "2.0.16"
+    logback_version = "1.5.7"
 }
 
 subprojects {
@@ -66,12 +68,21 @@ subprojects {
             dependency "com.googlecode.protobuf-java-format:protobuf-java-format:1.4"
 
             dependency "com.michael-bull.kotlin-retry:kotlin-retry:${retry_version}"
+            dependency "org.slf4j:slf4j-api:${slf4j_version}"
+            dependency "ch.qos.logback:logback-classic:${logback_version}"
+
         }
     }
 
     dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-        testImplementation "org.jetbrains.kotlin:kotlin-test"
+        implementation(
+                "org.jetbrains.kotlinx:kotlinx-serialization-json",
+                "org.slf4j:slf4j-api",
+        )
+        testImplementation(
+                "org.jetbrains.kotlin:kotlin-test",
+                "ch.qos.logback:logback-classic",
+        )
     }
 }
 
