@@ -1,5 +1,7 @@
 package com.example.lattice
 
+import com.example.lattice.Curve.Secp256k1
+import com.example.lattice.Curve.Sm2p256v1
 import com.example.lattice.Strategy.*
 import com.example.lattice.model.sign
 import com.example.lattice.provider.HttpApiImpl
@@ -22,14 +24,27 @@ internal val gson by lazy {
     Gson()
 }
 
-
+// 零账户地址
 const val ZERO_ADDRESS = "zltc_QLbz7JHiBTspS962RLKV8GndWFwjA5K66"
 
+/**
+ * 椭圆曲线枚举
+ *
+ * @property Sm2p256v1 国密曲线
+ * @property Secp256k1 国际曲线
+ */
 enum class Curve {
     Sm2p256v1,
     Secp256k1
 }
 
+/**
+ * 链配置信息
+ *
+ * @property chainId 链ID
+ * @property curve [Curve] 链签名使用的椭圆曲线
+ * @property tokenLess 是否使用通证，默认值true:不使用通证
+ */
 data class ChainConfig(val chainId: Int, val curve: Curve, val tokenLess: Boolean = true) {
     init {
         require(chainId > 0) { "Chain ID must be greater than zero." }
@@ -40,12 +55,19 @@ fun ChainConfig.isGM(): Boolean {
     return curve == Curve.Sm2p256v1
 }
 
+/**
+ * 连接节点配置
+ *
+ * @property url 节点的http连接信息
+ */
 data class ConnectingNodeConfig(val url: String)
 
 /**
+ * 交易的凭证信息
+ *
  * @property accountAddress 账户地址
  * @property privateKey 私钥（16进制字符串）
- * @property passphrase 身份密码，用来解密FileKey
+ * @property passphrase 身份密码，用来解密FileKey，默认null
  */
 data class CredentialConfig(val accountAddress: String, val privateKey: String, val passphrase: String? = null) {
     init {
@@ -54,14 +76,19 @@ data class CredentialConfig(val accountAddress: String, val privateKey: String, 
     }
 }
 
+/**
+ * 可选配置
+ *
+ * @property interval 间隔
+ */
 data class Options(val interval: Int)
 
 /**
  * 重试策略
  *
- * @property BACK_OFF
- * @property FIXED_INTERVAL
- * @property RANDOM_INTERVAL
+ * @property BACK_OFF 退避算法
+ * @property FIXED_INTERVAL 固定间隔
+ * @property RANDOM_INTERVAL 随机间隔
  */
 enum class Strategy {
     BACK_OFF,
