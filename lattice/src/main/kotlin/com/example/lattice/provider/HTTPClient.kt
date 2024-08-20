@@ -1,6 +1,7 @@
 package com.example.lattice.provider
 
 import com.example.lattice.gson
+import com.example.lattice.logger
 import com.example.lattice.model.*
 import com.example.model.Address
 import com.example.model.block.CurrentTDBlock
@@ -147,6 +148,7 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
      * @return T generic
      */
     private inline fun <reified T : Any> sendUseJsonRpc(method: String, params: Array<Any>): T {
+        logger.debug("开始发起json-rpc请求，method: $method, params: ${params.contentToString()}")
         val headers = mutableMapOf<String, String>().apply {
             put("chainId", _params.chainIdAsString())
             _params.token?.let { token ->
@@ -156,9 +158,11 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         val response = _client.send(JsonRpcPayload(method = method, params = params), headers)
         val type = TypeToken.getParameterized(JsonRpcResponse::class.java, T::class.java).type
         val jsonRpcResponse = gson.fromJson<JsonRpcResponse<T>>(response, type)
-        return jsonRpcResponse.result?.takeIf {
+        val result = jsonRpcResponse.result?.takeIf {
             jsonRpcResponse.error == null
         } ?: throw Error(jsonRpcResponse.error?.message ?: "Empty result.")
+        logger.debug("结束发起json-rpc请求，method: $method, result: ${gson.toJson(result)}")
+        return result
     }
 
     override fun refreshToken(newToken: String) {

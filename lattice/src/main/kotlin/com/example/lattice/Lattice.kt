@@ -55,7 +55,7 @@ data class ChainConfig(val chainId: Int, val curve: Curve, val tokenLess: Boolea
 }
 
 fun ChainConfig.isGM(): Boolean {
-    return curve == Curve.Sm2p256v1
+    return curve == Sm2p256v1
 }
 
 /**
@@ -294,6 +294,7 @@ class LatticeImpl(
     }
 
     override fun deployContract(data: String, payload: String, amount: Long, joule: Long): String {
+        logger.debug("开始发起部署合约交易，data: {}, payload: {}, amount: {}, joule: {}", data, payload, amount, joule)
         val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
         val transaction = DeployContractTXBuilder.builder()
             .setBlock(block)
@@ -308,7 +309,9 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        return _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(transaction)
+        logger.debug("结束部署合约，交易哈希为：{}", hash)
+        return hash
     }
 
     override fun deployContractWaitReceipt(
@@ -335,6 +338,10 @@ class LatticeImpl(
         amount: Long,
         joule: Long
     ): String {
+        logger.debug(
+            "开始发起调用合约交易，contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
+            contractAddress, data, payload, amount, joule
+        )
         val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
         val transaction = CallContractTXBuilder.builder()
             .setBlock(block)
@@ -349,7 +356,9 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        return _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(transaction)
+        logger.debug("结束调用合约，交易哈希为：{}", hash)
+        return hash
     }
 
     override fun callContractWaitReceipt(
@@ -377,6 +386,10 @@ class LatticeImpl(
         amount: Long,
         joule: Long
     ): Receipt {
+        logger.debug(
+            "开始发起预执行合约交易，contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
+            contractAddress, data, payload, amount, joule
+        )
         val transaction = CallContractTXBuilder.builder()
             .setBlock(CurrentTDBlock.zeroBlock())
             .setOwner(Address(_credentialConfig.accountAddress))
@@ -387,6 +400,8 @@ class LatticeImpl(
             .setJoule(joule)
             .build()
 
-        return _httpApi.preCallContract(transaction)
+        val receipt = _httpApi.preCallContract(transaction)
+        logger.debug("结束预调用合约，回执为：{}", gson.toJson(receipt))
+        return receipt
     }
 }
