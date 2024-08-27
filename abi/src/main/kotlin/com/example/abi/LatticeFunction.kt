@@ -1,6 +1,9 @@
 package com.example.abi
 
 import com.example.abi.model.Types
+import com.example.model.RegExpr.ADDRESS
+import com.example.model.RegExpr.ETHEREUM_ADDRESS
+import com.example.model.toEthereumAddress
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -140,8 +143,11 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         type == Types.ADDRESS.value -> {
             val addr =
                 arg as? String ?: throw IllegalArgumentException("Invalid argument type, Address needs to be String")
-            if (!addr.startsWith("0x")) throw IllegalArgumentException("Invalid argument value, Address needs to be start with 0x")
-            return Address(addr)
+            return when {
+                ADDRESS.toRegex().matches(addr) -> Address(com.example.model.Address(addr).toEthereumAddress())
+                ETHEREUM_ADDRESS.toRegex().matches(addr) -> Address(addr)
+                else -> throw IllegalArgumentException("Invalid argument value, invalid Address format")
+            }
         }
 
 
@@ -195,7 +201,7 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             // return UintNumber(numStr.toBigInteger(), uintSize(type))
         }
 
-        SOL_TY_INT_REGEX.toRegex().matches(type) -> {
+        type.matches(Regex(SOL_TY_INT_REGEX)) -> {
             val num: BigInteger = when (arg) {
                 is String -> BigInteger(arg)
                 is Byte, is Short, is Int, is Long -> BigInteger(arg.toString())
@@ -241,17 +247,62 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             // return IntNumber(numStr.toBigInteger(), intSize(type))
         }
 
-        type == Types.BOOL.value -> Bool(
-            arg as? Boolean ?: throw IllegalArgumentException("Invalid argument type, Bool needs to be Boolean")
-        )
+        type == Types.BOOL.value -> {
+            return when (arg) {
+                is Boolean -> Bool(arg)
+                is String -> Bool(arg.toBoolean())
+                is Byte -> Bool(arg == 1.toByte())
+                else -> throw IllegalArgumentException("Invalid argument type, Bool only supports Boolean, String and Byte")
+            }
+        }
 
-        type == Types.BYTES32.value -> Bytes32(
-            Hex.decode(
+        // fixme adapt different bit size array, for example: Byte1 ~ Byte32
+        type.matches(Regex(SOL_TY_BYTES_REGEX)) -> {
+            val bytes = Hex.decode(
                 (arg as? String
-                    ?: throw IllegalArgumentException("Invalid argument type, Bytes32 needs to be Hex String"))
+                    ?: throw IllegalArgumentException("Invalid argument type, $type needs to be Hex String"))
                     .removePrefix("0x")
             )
-        )
+            val size = bytesSize(type)
+            if (bytes.size != size) {
+                throw IllegalArgumentException("Invalid argument type, $type expect $size byte, but $arg is ${bytes.size}")
+            }
+            return when (size) {
+                1 -> Bytes1(bytes)
+                2 -> Bytes2(bytes)
+                3 -> Bytes3(bytes)
+                4 -> Bytes4(bytes)
+                5 -> Bytes5(bytes)
+                6 -> Bytes6(bytes)
+                7 -> Bytes7(bytes)
+                8 -> Bytes8(bytes)
+                9 -> Bytes9(bytes)
+                10 -> Bytes10(bytes)
+                11 -> Bytes11(bytes)
+                12 -> Bytes12(bytes)
+                13 -> Bytes13(bytes)
+                14 -> Bytes14(bytes)
+                15 -> Bytes15(bytes)
+                16 -> Bytes16(bytes)
+                17 -> Bytes17(bytes)
+                18 -> Bytes18(bytes)
+                19 -> Bytes19(bytes)
+                20 -> Bytes20(bytes)
+                21 -> Bytes21(bytes)
+                22 -> Bytes22(bytes)
+                23 -> Bytes23(bytes)
+                24 -> Bytes24(bytes)
+                25 -> Bytes25(bytes)
+                26 -> Bytes26(bytes)
+                27 -> Bytes27(bytes)
+                28 -> Bytes28(bytes)
+                29 -> Bytes29(bytes)
+                30 -> Bytes30(bytes)
+                31 -> Bytes31(bytes)
+                32 -> Bytes32(bytes)
+                else -> throw IllegalArgumentException("Invalid argument type, Bytes${bytes.size} not support")
+            }
+        }
 
         type == Types.TUPLE.value -> {
             val array = arg as Array<*>
@@ -293,12 +344,11 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         }
 
         // todo adaptive fixed array
-        type.matches(Regex("[a-zA-Z]+[1-9]*\\[\\d+]\$")) -> Utf8String("")
+        type.matches(Regex(SOL_FIXED_ARRAY_REGEX)) -> Utf8String("")
 
         else -> return Utf8String(arg as String)
     }
 }
-
 
 /// 匹配 solidity 的byte1-byte32类型
 const val SOL_TY_BYTES_REGEX = "^(bytes)([1-9]*)$"
@@ -309,9 +359,11 @@ const val SOL_TY_UINT_REGEX = "^(uint)([1-9]*)$"
 /// 匹配 solidity 的int1-int256类型
 const val SOL_TY_INT_REGEX = "^(int)([1-9]*)$"
 
+/// 匹配 solidity 的固定数组
+const val SOL_FIXED_ARRAY_REGEX = "[a-zA-Z]+[1-9]*\\[\\d+]\$"
+
 /// 匹配 solidity 的 array 类型，Example: string[], bool[], bytes32[], uint256[]...
 const val SOL_TY_ARRAY_REGEX = "^([a-z1-9]+)(\\[([1-9]*)])$"
-
 
 fun uintSize(ty: String): Int {
     val pattern = SOL_TY_UINT_REGEX.toRegex()
@@ -323,3 +375,8 @@ fun intSize(ty: String): Int {
     return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
 }
 
+// 获取bytes的长度
+fun bytesSize(ty: String): Int {
+    val pattern = SOL_TY_BYTES_REGEX.toRegex()
+    return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
+}

@@ -1,6 +1,7 @@
 description = 'abi'
 
 dependencies {
+    implementation project(path: ':model')
     implementation(
             "org.web3j:core",
             "org.web3j:utils",
