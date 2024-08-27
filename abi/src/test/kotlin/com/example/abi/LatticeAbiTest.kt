@@ -3,6 +3,7 @@ package com.example.abi
 import junit.framework.TestCase.assertEquals
 import kotlin.test.Test
 
+
 class LatticeAbiTest {
 
     private val abi =
@@ -104,5 +105,17 @@ class LatticeAbiTest {
         val code = LatticeAbi(abi).getFunction("writeTraceabilityBatch").encode(args)
         println(code)
         assertEquals(expected, code)
+    }
+
+    @Test
+    fun `encode fixed array`() {
+        val abi =
+            "[{\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string[2]\",\"name\":\"_name\",\"type\":\"string[2]\"}],\"name\":\"set\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+        val code = LatticeAbi(abi).getFunction("set").encode(arrayOf(arrayOf("1", "2")))
+        println(code)
+        val expected =
+            "0x74d379540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013200000000000000000000000000000000000000000000000000000000000000"
+        assertEquals(expected, code)
+        // 0x74d379540000000000000000000000000000000000000000000000000000000000000001310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013200000000000000000000000000000000000000000000000000000000000000
     }
 }

@@ -1,5 +1,8 @@
 package com.example.abi.model
 
+import org.web3j.abi.datatypes.StaticArray
+import org.web3j.abi.datatypes.Type
+
 enum class Types(val value: String? = null) {
     BOOL("bool"),
     STRING("string"),
@@ -57,4 +60,8 @@ enum class Types(val value: String? = null) {
     TUPLE("tuple"),
     DynamicArray("[]"),
     FixedArray("[a-zA-Z]+[1-9]*\\[\\d+]\$")
+}
+
+class FixedArray<T : Type<*>>(size: Int, values: List<T>) : StaticArray<T>(size, values) {
+    constructor(size: Int, vararg values: T) : this(size, values.asList())
 }

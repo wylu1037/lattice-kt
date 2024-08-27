@@ -1,5 +1,6 @@
 package com.example.abi
 
+import com.example.abi.model.FixedArray
 import com.example.abi.model.Types
 import com.example.model.RegExpr.ADDRESS
 import com.example.model.RegExpr.ETHEREUM_ADDRESS
@@ -155,7 +156,7 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             arg as? String ?: throw IllegalArgumentException("Invalid argument type, String needs to be String")
         )
 
-        SOL_TY_UINT_REGEX.toRegex().matches(type) -> {
+        type.matches(Regex(SOL_TY_UINT_REGEX)) -> {
             val num: BigInteger = when (arg) {
                 is String -> BigInteger(arg)
                 is Byte, is Short, is Int, is Long -> BigInteger(arg.toString())
@@ -163,39 +164,39 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
                 else -> throw IllegalArgumentException("Invalid argument type, Uint only supports String, Byte, Short, Int, Long and BigInteger")
             }
 
-            when (val bitSize = uintSize(type)) {
-                8 -> return Uint8(num)
-                16 -> return Uint16(num)
-                24 -> return Uint24(num)
-                32 -> return Uint32(num)
-                40 -> return Uint40(num)
-                48 -> return Uint48(num)
-                56 -> return Uint56(num)
-                64 -> return Uint64(num)
-                72 -> return Uint72(num)
-                80 -> return Uint80(num)
-                88 -> return Uint88(num)
-                96 -> return Uint96(num)
-                104 -> return Uint104(num)
-                112 -> return Uint112(num)
-                120 -> return Uint120(num)
-                128 -> return Uint128(num)
-                136 -> return Uint136(num)
-                144 -> return Uint144(num)
-                152 -> return Uint152(num)
-                160 -> return Uint160(num)
-                168 -> return Uint168(num)
-                176 -> return Uint176(num)
-                184 -> return Uint184(num)
-                192 -> return Uint192(num)
-                200 -> return Uint200(num)
-                208 -> return Uint208(num)
-                216 -> return Uint216(num)
-                224 -> return Uint224(num)
-                232 -> return Uint232(num)
-                240 -> return Uint240(num)
-                248 -> return Uint248(num)
-                256 -> return Uint256(num)
+            return when (val bitSize = uintSize(type)) {
+                8 -> Uint8(num)
+                16 -> Uint16(num)
+                24 -> Uint24(num)
+                32 -> Uint32(num)
+                40 -> Uint40(num)
+                48 -> Uint48(num)
+                56 -> Uint56(num)
+                64 -> Uint64(num)
+                72 -> Uint72(num)
+                80 -> Uint80(num)
+                88 -> Uint88(num)
+                96 -> Uint96(num)
+                104 -> Uint104(num)
+                112 -> Uint112(num)
+                120 -> Uint120(num)
+                128 -> Uint128(num)
+                136 -> Uint136(num)
+                144 -> Uint144(num)
+                152 -> Uint152(num)
+                160 -> Uint160(num)
+                168 -> Uint168(num)
+                176 -> Uint176(num)
+                184 -> Uint184(num)
+                192 -> Uint192(num)
+                200 -> Uint200(num)
+                208 -> Uint208(num)
+                216 -> Uint216(num)
+                224 -> Uint224(num)
+                232 -> Uint232(num)
+                240 -> Uint240(num)
+                248 -> Uint248(num)
+                256 -> Uint256(num)
                 else -> throw IllegalArgumentException("Invalid argument type, Uint bit size not support $bitSize")
             }
             // return UintNumber(numStr.toBigInteger(), uintSize(type))
@@ -209,39 +210,39 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
                 else -> throw IllegalArgumentException("Invalid argument type, Int only supports String, Byte, Short, Int, Long and BigInteger")
             }
 
-            when (val bitSize = intSize(type)) {
-                8 -> return Int8(num)
-                16 -> return Int16(num)
-                24 -> return Int24(num)
-                32 -> return Int32(num)
-                40 -> return Int40(num)
-                48 -> return Int48(num)
-                56 -> return Int56(num)
-                64 -> return Int64(num)
-                72 -> return Int72(num)
-                80 -> return Int80(num)
-                88 -> return Int88(num)
-                96 -> return Int96(num)
-                104 -> return Int104(num)
-                112 -> return Int112(num)
-                120 -> return Int120(num)
-                128 -> return Int128(num)
-                136 -> return Int136(num)
-                144 -> return Int144(num)
-                152 -> return Int152(num)
-                160 -> return Int160(num)
-                168 -> return Int168(num)
-                176 -> return Int176(num)
-                184 -> return Int184(num)
-                192 -> return Int192(num)
-                200 -> return Int200(num)
-                208 -> return Int208(num)
-                216 -> return Int216(num)
-                224 -> return Int224(num)
-                232 -> return Int232(num)
-                240 -> return Int240(num)
-                248 -> return Int248(num)
-                256 -> return Int256(num)
+            return when (val bitSize = intSize(type)) {
+                8 -> Int8(num)
+                16 -> Int16(num)
+                24 -> Int24(num)
+                32 -> Int32(num)
+                40 -> Int40(num)
+                48 -> Int48(num)
+                56 -> Int56(num)
+                64 -> Int64(num)
+                72 -> Int72(num)
+                80 -> Int80(num)
+                88 -> Int88(num)
+                96 -> Int96(num)
+                104 -> Int104(num)
+                112 -> Int112(num)
+                120 -> Int120(num)
+                128 -> Int128(num)
+                136 -> Int136(num)
+                144 -> Int144(num)
+                152 -> Int152(num)
+                160 -> Int160(num)
+                168 -> Int168(num)
+                176 -> Int176(num)
+                184 -> Int184(num)
+                192 -> Int192(num)
+                200 -> Int200(num)
+                208 -> Int208(num)
+                216 -> Int216(num)
+                224 -> Int224(num)
+                232 -> Int232(num)
+                240 -> Int240(num)
+                248 -> Int248(num)
+                256 -> Int256(num)
                 else -> throw IllegalArgumentException("Invalid argument type, Int bit size not support $bitSize")
             }
             // return IntNumber(numStr.toBigInteger(), intSize(type))
@@ -256,7 +257,7 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             }
         }
 
-        // fixme adapt different bit size array, for example: Byte1 ~ Byte32
+        // bytes1 ~ bytes32
         type.matches(Regex(SOL_TY_BYTES_REGEX)) -> {
             val bytes = Hex.decode(
                 (arg as? String
@@ -314,9 +315,10 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
             DynamicStruct(convertedArgs)
         }
 
+        // 动态数组：dynamic array
         type.endsWith("[]") -> {
             val array = arg as Array<*>
-            when (val childrenType = type.removeSuffix("[]")) {
+            return when (val childrenType = type.removeSuffix("[]")) {
                 Types.TUPLE.value -> {
                     val components = namedType.components
                         ?: throw IllegalArgumentException("Invalid argument type, Tuple components can not be null")
@@ -333,18 +335,26 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
 
                 else -> DynamicArray(array.map { item ->
                     convertArgument(
-                        EthereumNamedType(
-                            "",
-                            childrenType,
-                            childrenType
-                        ), item
+                        EthereumNamedType("", childrenType, childrenType), item
                     )
                 })
             }
         }
 
-        // todo adaptive fixed array
-        type.matches(Regex(SOL_FIXED_ARRAY_REGEX)) -> Utf8String("")
+        // fixme web3j have a bug with static array
+        // 静态数组：fixed array
+        type.matches(Regex(SOL_FIXED_ARRAY_REGEX)) -> {
+            val array = arg as Array<*>
+            val ty = fixedArrayType(type)
+            val size = fixedArraySize(type)
+            val convertedArgs = FixedArray(
+                size,
+                array.map { item ->
+                    convertArgument(EthereumNamedType("", ty, ty), item)
+                }
+            )
+            return convertedArgs
+        }
 
         else -> return Utf8String(arg as String)
     }
@@ -360,7 +370,7 @@ const val SOL_TY_UINT_REGEX = "^(uint)([1-9]*)$"
 const val SOL_TY_INT_REGEX = "^(int)([1-9]*)$"
 
 /// 匹配 solidity 的固定数组
-const val SOL_FIXED_ARRAY_REGEX = "[a-zA-Z]+[1-9]*\\[\\d+]\$"
+const val SOL_FIXED_ARRAY_REGEX = "([a-zA-Z]+[1-9]*)\\[(\\d+)]$"
 
 /// 匹配 solidity 的 array 类型，Example: string[], bool[], bytes32[], uint256[]...
 const val SOL_TY_ARRAY_REGEX = "^([a-z1-9]+)(\\[([1-9]*)])$"
@@ -378,5 +388,17 @@ fun intSize(ty: String): Int {
 // 获取bytes的长度
 fun bytesSize(ty: String): Int {
     val pattern = SOL_TY_BYTES_REGEX.toRegex()
+    return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
+}
+
+fun fixedArrayType(ty: String): String {
+    val pattern = SOL_FIXED_ARRAY_REGEX.toRegex()
+    val groups = pattern.find(ty)?.groups
+    return pattern.find(ty)?.groups?.get(1)?.value ?: ""
+}
+
+fun fixedArraySize(ty: String): Int {
+    val pattern = SOL_FIXED_ARRAY_REGEX.toRegex()
+    val groups = pattern.find(ty)?.groups
     return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
 }
