@@ -1,8 +1,6 @@
 package com.example.abi
 
-import com.example.abi.model.IntNumber
 import com.example.abi.model.Types
-import com.example.abi.model.UintNumber
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -18,8 +16,9 @@ import org.web3j.abi.FunctionReturnDecoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.*
 import org.web3j.abi.datatypes.Function
-import org.web3j.abi.datatypes.generated.Bytes32
+import org.web3j.abi.datatypes.generated.*
 import org.web3j.protocol.core.methods.response.AbiDefinition
+import java.math.BigInteger
 
 object Json {
     val MAPPER: JsonMapper = JsonMapper.builder()
@@ -151,16 +150,95 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         )
 
         SOL_TY_UINT_REGEX.toRegex().matches(type) -> {
-            val numStr = arg as? String
-                ?: throw IllegalArgumentException("Invalid argument type, Uint needs to be String")
+            val num: BigInteger = when (arg) {
+                is String -> BigInteger(arg)
+                is Byte, is Short, is Int, is Long -> BigInteger(arg.toString())
+                is BigInteger -> arg
+                else -> throw IllegalArgumentException("Invalid argument type, Uint only supports String, Byte, Short, Int, Long and BigInteger")
+            }
 
-            return UintNumber(numStr.toBigInteger(), uintSize(type))
+            when (val bitSize = uintSize(type)) {
+                8 -> return Uint8(num)
+                16 -> return Uint16(num)
+                24 -> return Uint24(num)
+                32 -> return Uint32(num)
+                40 -> return Uint40(num)
+                48 -> return Uint48(num)
+                56 -> return Uint56(num)
+                64 -> return Uint64(num)
+                72 -> return Uint72(num)
+                80 -> return Uint80(num)
+                88 -> return Uint88(num)
+                96 -> return Uint96(num)
+                104 -> return Uint104(num)
+                112 -> return Uint112(num)
+                120 -> return Uint120(num)
+                128 -> return Uint128(num)
+                136 -> return Uint136(num)
+                144 -> return Uint144(num)
+                152 -> return Uint152(num)
+                160 -> return Uint160(num)
+                168 -> return Uint168(num)
+                176 -> return Uint176(num)
+                184 -> return Uint184(num)
+                192 -> return Uint192(num)
+                200 -> return Uint200(num)
+                208 -> return Uint208(num)
+                216 -> return Uint216(num)
+                224 -> return Uint224(num)
+                232 -> return Uint232(num)
+                240 -> return Uint240(num)
+                248 -> return Uint248(num)
+                256 -> return Uint256(num)
+                else -> throw IllegalArgumentException("Invalid argument type, Uint bit size not support $bitSize")
+            }
+            // return UintNumber(numStr.toBigInteger(), uintSize(type))
         }
 
         SOL_TY_INT_REGEX.toRegex().matches(type) -> {
-            val numStr = arg as? String
-                ?: throw IllegalArgumentException("Invalid argument type, Uint needs to be String")
-            return IntNumber(numStr.toBigInteger(), intSize(type))
+            val num: BigInteger = when (arg) {
+                is String -> BigInteger(arg)
+                is Byte, is Short, is Int, is Long -> BigInteger(arg.toString())
+                is BigInteger -> arg
+                else -> throw IllegalArgumentException("Invalid argument type, Int only supports String, Byte, Short, Int, Long and BigInteger")
+            }
+
+            when (val bitSize = intSize(type)) {
+                8 -> return Int8(num)
+                16 -> return Int16(num)
+                24 -> return Int24(num)
+                32 -> return Int32(num)
+                40 -> return Int40(num)
+                48 -> return Int48(num)
+                56 -> return Int56(num)
+                64 -> return Int64(num)
+                72 -> return Int72(num)
+                80 -> return Int80(num)
+                88 -> return Int88(num)
+                96 -> return Int96(num)
+                104 -> return Int104(num)
+                112 -> return Int112(num)
+                120 -> return Int120(num)
+                128 -> return Int128(num)
+                136 -> return Int136(num)
+                144 -> return Int144(num)
+                152 -> return Int152(num)
+                160 -> return Int160(num)
+                168 -> return Int168(num)
+                176 -> return Int176(num)
+                184 -> return Int184(num)
+                192 -> return Int192(num)
+                200 -> return Int200(num)
+                208 -> return Int208(num)
+                216 -> return Int216(num)
+                224 -> return Int224(num)
+                232 -> return Int232(num)
+                240 -> return Int240(num)
+                248 -> return Int248(num)
+                256 -> return Int256(num)
+                else -> throw IllegalArgumentException("Invalid argument type, Int bit size not support $bitSize")
+            }
+            // return IntNumber(numStr.toBigInteger(), intSize(type))
         }
 
         type == Types.BOOL.value -> Bool(

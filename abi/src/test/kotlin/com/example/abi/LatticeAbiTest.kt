@@ -89,13 +89,13 @@ class LatticeAbiTest {
                     111222333L,
                     "str0",
                     arrayOf("0x516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e7432"),
-                    "561717f7922a233720ae38acaa4174cda0bf1766"
+                    "0x561717f7922a233720ae38acaa4174cda0bf1766"
                 ),
                 arrayOf<Any>(
-                    111222333L,
+                    "111222333",
                     "str0",
                     arrayOf("0x516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e7432"),
-                    "561717f7922a233720ae38acaa4174cda0bf1766"
+                    "0x561717f7922a233720ae38acaa4174cda0bf1766"
                 )
             )
         )
