@@ -316,9 +316,9 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         }
 
         // 动态数组：dynamic array
-        type.endsWith("[]") -> {
+        type.matches(Regex(SOL_DYNAMIC_ARRAY_REGEX)) -> {
             val array = arg as Array<*>
-            return when (val childrenType = type.removeSuffix("[]")) {
+            return when (val childrenType = dynamicArrayElemType(type)) {
                 Types.TUPLE.value -> {
                     val components = namedType.components
                         ?: throw IllegalArgumentException("Invalid argument type, Tuple components can not be null")
@@ -345,7 +345,7 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         // 静态数组：fixed array
         type.matches(Regex(SOL_FIXED_ARRAY_REGEX)) -> {
             val array = arg as Array<*>
-            val ty = fixedArrayType(type)
+            val ty = fixedArrayElemType(type)
             val size = fixedArraySize(type)
             val convertedArgs = FixedArray(
                 size,
@@ -372,8 +372,8 @@ const val SOL_TY_INT_REGEX = "^(int)([1-9]*)$"
 /// 匹配 solidity 的固定数组
 const val SOL_FIXED_ARRAY_REGEX = "([a-zA-Z]+[1-9]*)\\[(\\d+)]$"
 
-/// 匹配 solidity 的 array 类型，Example: string[], bool[], bytes32[], uint256[]...
-const val SOL_TY_ARRAY_REGEX = "^([a-z1-9]+)(\\[([1-9]*)])$"
+/// 匹配 solidity 的动态数组
+const val SOL_DYNAMIC_ARRAY_REGEX = "([a-zA-Z]+[1-9]*)\\[]$"
 
 fun uintSize(ty: String): Int {
     val pattern = SOL_TY_UINT_REGEX.toRegex()
@@ -391,14 +391,17 @@ fun bytesSize(ty: String): Int {
     return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
 }
 
-fun fixedArrayType(ty: String): String {
+fun fixedArrayElemType(ty: String): String {
     val pattern = SOL_FIXED_ARRAY_REGEX.toRegex()
-    val groups = pattern.find(ty)?.groups
     return pattern.find(ty)?.groups?.get(1)?.value ?: ""
 }
 
 fun fixedArraySize(ty: String): Int {
     val pattern = SOL_FIXED_ARRAY_REGEX.toRegex()
-    val groups = pattern.find(ty)?.groups
     return pattern.find(ty)?.groups?.get(2)?.value?.toInt() ?: 0
+}
+
+fun dynamicArrayElemType(ty: String): String {
+    val pattern = SOL_DYNAMIC_ARRAY_REGEX.toRegex()
+    return pattern.find(ty)?.groups?.get(1)?.value ?: ""
 }
