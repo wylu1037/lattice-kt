@@ -1,0 +1,228 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>EllipticCurvePoint</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            lattice-kt
+                    </a>            </div>
+            <div class="library-version">1.0-SNAPSHOT
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":crypto:dokkaHtmlPartial/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="crypto::com.example.crypto.impl.ec/EllipticCurvePoint///PointingToDeclaration//-688304473">
+  <div class="breadcrumbs"><a href="../../index.html">crypto</a><span class="delimiter">/</span><a href="../index.html">com.example.crypto.impl.ec</a><span class="delimiter">/</span><span class="current">EllipticCurvePoint</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Elliptic</span><wbr><span>Curve</span><wbr><span><span>Point</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">EllipticCurvePoint</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ecPoint<span class="token operator">: </span><span data-unresolved-link="org.bouncycastle.math.ec/ECPoint///PointingToDeclaration/">ECPoint</span></span></span><span class="token punctuation">)</span> : <a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="890682517%2FConstructors%2F-688304473" anchor-label="EllipticCurvePoint" id="890682517%2FConstructors%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-elliptic-curve-point.html"><span>Elliptic</span><wbr><span>Curve</span><wbr><span><span>Point</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="890682517%2FConstructors%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ecPoint<span class="token operator">: </span><span data-unresolved-link="org.bouncycastle.math.ec/ECPoint///PointingToDeclaration/">ECPoint</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-568594702%2FProperties%2F-688304473" anchor-label="x" id="-568594702%2FProperties%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="x.html"><span><span>x</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-568594702%2FProperties%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="x.html">x</a><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigInteger.html">BigInteger</a></div><div class="brief "><p class="paragraph">椭圆曲线上点的横坐标</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-537574895%2FProperties%2F-688304473" anchor-label="y" id="-537574895%2FProperties%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="y.html"><span><span>y</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-537574895%2FProperties%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="y.html">y</a><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigInteger.html">BigInteger</a></div><div class="brief "><p class="paragraph">椭圆曲线上点的纵坐标</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1057011496%2FFunctions%2F-688304473" anchor-label="add" id="1057011496%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add.html"><span><span>add</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1057011496%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="add.html"><span class="token function">add</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p<span class="token operator">: </span><a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a></div><div class="brief "><p class="paragraph">椭圆曲线点加法操作</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2022768735%2FFunctions%2F-688304473" anchor-label="encoded" id="-2022768735%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="encoded.html"><span><span>encoded</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2022768735%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="encoded.html"><span class="token function">encoded</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">compressed<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html">ByteArray</a></div><div class="brief "><p class="paragraph">将椭圆曲线上的点编码为大整数，可选地采用压缩格式。在压缩格式下，利用椭圆曲线的特性可以仅用一个大整数来表示一个点， 从而节省存储空间。非压缩格式则通常包含 x 和 y 坐标两个大整数的信息。</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1498698878%2FFunctions%2F-688304473" anchor-label="isInfinity" id="1498698878%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-infinity.html"><span>is</span><wbr><span><span>Infinity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1498698878%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="is-infinity.html"><span class="token function">isInfinity</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">判断当前点是否是无穷远点（O），即是否是椭圆曲线群的单位元。</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1106122930%2FFunctions%2F-688304473" anchor-label="mul" id="-1106122930%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mul.html"><span><span>mul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1106122930%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="mul.html"><span class="token function">mul</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigInteger.html">BigInteger</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a></div><div class="brief "><p class="paragraph">点的倍乘运算</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1391441149%2FFunctions%2F-688304473" anchor-label="normalize" id="1391441149%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="normalize.html"><span><span>normalize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1391441149%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="normalize.html"><span class="token function">normalize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a></div><div class="brief "><p class="paragraph">此方法用于规范化椭圆曲线上的点，确保它是以最简形式表示，例如消除多余的因式或者处理无穷远点等特殊情况。</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-17305487%2FFunctions%2F-688304473" anchor-label="toPublicKey" id="-17305487%2FFunctions%2F-688304473" data-filterable-set=":crypto:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":crypto:dokkaHtmlPartial/main" data-filterable-set=":crypto:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../com.example.crypto.api.ec/to-public-key.html"><span>to</span><wbr><span>Public</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-17305487%2FFunctions%2F-688304473"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":crypto:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../com.example.crypto.api.ec/-curve-point/index.html">CurvePoint</a><span class="token punctuation">.</span><a href="../../com.example.crypto.api.ec/to-public-key.html"><span class="token function">toPublicKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../model/com.example.model/-public-key/index.html">PublicKey</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
