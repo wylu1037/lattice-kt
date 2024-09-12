@@ -2,7 +2,6 @@ package com.example.lattice.proto
 
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.writeText
 
@@ -46,13 +45,13 @@ object Compiler {
             if (code == 0) {
                 return out
             } else {
-                Files.deleteIfExists(Path.of(out))
+                Files.deleteIfExists(Paths.get(out))
                 throw RuntimeException("Error compiling $filename")
             }
         } catch (e: Exception) {
             throw RuntimeException(e)
         } finally {
-            Files.deleteIfExists(Path.of("$source${File.separator}$filename$PROTO_SUFFIX"))
+            Files.deleteIfExists(Paths.get("$source${File.separator}$filename$PROTO_SUFFIX"))
         }
     }
 }

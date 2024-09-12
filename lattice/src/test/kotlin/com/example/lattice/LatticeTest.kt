@@ -112,7 +112,7 @@ class LatticeTest {
     }
 
     @Test
-    fun `multiple build payload`() {
+    fun `concurrent build payload tx`() {
         val accounts = arrayOf("zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi", "zltc_RvmBhKxeLojxYCCoMM4iaxpkeJ1FjLBHQ")
         val privateKeys = arrayOf(
             "0x23d5b2a2eb0a9c8b86d62cbc3955cfd1fb26ec576ecc379f402d0f5d2b27a7bb",
@@ -280,9 +280,4 @@ fun generateDataId(): String {
     return "0x" + (1..64)
         .map { chars.random() }
         .joinToString("")
-}
-
-fun main() {
-    val addr = Address("zltc_Z1pnS94bP4hQSYLs4aP4UwBP9pH8bEvhi")
-    println(addr.toEthereumAddress())
 }

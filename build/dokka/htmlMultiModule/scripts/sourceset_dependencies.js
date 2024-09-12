@@ -1,1 +1,0 @@
-sourceset_dependencies = '{":wallet:dokkaHtmlPartial/main":[],":lattice:dokkaHtmlPartial/main":[],":rlp:dokkaHtmlPartial/main":[],":abi:dokkaHtmlPartial/main":[],":mnemonic:dokkaHtmlPartial/main":[],":model:dokkaHtmlPartial/main":[],":crypto:dokkaHtmlPartial/main":[]}'

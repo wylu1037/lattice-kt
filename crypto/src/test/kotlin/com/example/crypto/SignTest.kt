@@ -1,11 +1,8 @@
 package com.example.crypto
 
 import com.example.crypto.extension.toECKeyPair
-import com.example.model.PrivateKey
-import com.example.model.SignatureData
+import com.example.model.*
 import com.example.model.extension.toHexString
-import com.example.model.toAddress
-import com.example.model.toHex
 import org.junit.Test
 import org.komputing.khex.extensions.hexToByteArray
 import org.komputing.khex.model.HexString
@@ -69,14 +66,11 @@ class SignTest {
     @Test
     fun `recovery keypair from private key`() {
         val isGM = true
-        val privateKey = "0xdbd91293f324e5e49f040188720c6c9ae7e6cc2b4c5274120ee25808e8f4b6a7"
+        val privateKey = "0x72ffdd7245e0ad7cffd533ad99f54048bf3fa6358e071fba8c2d7783d992d997"
         val keypair = PrivateKey(HexString(privateKey)).toECKeyPair(isGM)
         println(keypair.publicKey.key.toHexString())
         val address = keypair.publicKey.toAddress(isGM)
+        println(address.toEthereumAddress())
         println(address)
-        // 0x6e8db685761cc07094b8bbc9b3a5e84da03de973f98de0c063bb0f1f4af9d8542cfc685e94b9da87c2466b765a7d657a700a3bef96e63bd0a89195d6e6086a2f
-        // zltc_jJdpKvG19bYMinz1hEjDpQ4rPryPj1Eos
-        // 0xe5dd7b589a5ed21447c9da86efb89ed9cbab99106e08d5645a52bab4caaed2b83393594cc1c404ba0df1b1cbb41401ee9652d66f806fce48e08db01c08a43af6
-        // zltc_dS73XWcJqu2uEk4cfWsX8DDhpb9xsaH9s
     }
 }
