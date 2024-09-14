@@ -1,6 +1,6 @@
-package com.example.mnemonic.model
+package com.example.wallet.model
 
-import com.example.mnemonic.toEntropy
+import com.example.wallet.toEntropy
 
 data class MnemonicWords(val words: Collection<String>) {
     /**

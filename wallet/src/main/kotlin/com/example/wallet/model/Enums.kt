@@ -1,4 +1,4 @@
-package com.example.mnemonic.model
+package com.example.wallet.model
 
 import com.example.mnemonic.wordlist.en.WORDLIST_ENGLISH
 import com.example.mnemonic.wordlist.es.WORDLIST_SPANISH

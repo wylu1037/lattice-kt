@@ -1,9 +1,14 @@
-package com.example.mnemonic
+package com.example.wallet
 
 import com.example.crypto.api.CryptoAPI
-import com.example.mnemonic.model.*
 import com.example.model.extension.toBitArray
 import com.example.model.extension.toByteArray
+import com.example.wallet.model.DEFAULT_PATH
+import com.example.wallet.model.Language
+import com.example.wallet.model.MnemonicWords
+import com.example.wallet.model.Seed
+import com.example.wallet.model.toKey
+import com.example.wallet.model.toWordList
 import org.komputing.khash.sha256.extensions.sha256
 import java.security.SecureRandom
 

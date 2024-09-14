@@ -1,4 +1,4 @@
-package com.example.mnemonic.model
+package com.example.wallet.model
 
 import com.example.model.PRIVATE_KEY_SIZE
 

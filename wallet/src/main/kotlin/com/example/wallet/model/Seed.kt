@@ -1,4 +1,4 @@
-package com.example.mnemonic.model
+package com.example.wallet.model
 
 import com.example.crypto.api.CryptoAPI
 import com.example.crypto.extension.toECKeyPair

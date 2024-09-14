@@ -4,6 +4,10 @@ dependencies {
     implementation project(path: ':model')
     implementation project(path: ':crypto')
     implementation(
-            "com.github.komputing.khex:extensions-jvm"
+            "com.github.komputing.khex:extensions-jvm",
+            "com.github.komputing:kbip44",
+            "com.github.komputing.khash:sha256-jvm",
+            "com.github.komputing.khash:ripemd160-jvm",
+            "org.bouncycastle:bcprov-jdk15to18",
     )
 }

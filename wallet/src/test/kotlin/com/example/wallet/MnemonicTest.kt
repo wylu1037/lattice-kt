@@ -1,10 +1,10 @@
-package com.example.mnemonic
+package com.example.wallet
 
 import com.example.crypto.createKeyPair
 import com.example.crypto.getCompressedPublicKey
-import com.example.mnemonic.model.Language
 import com.example.model.extension.toHexString
 import com.example.model.toAddress
+import com.example.wallet.model.Language
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
