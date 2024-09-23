@@ -1,11 +1,16 @@
 package com.example.crypto
 
 import com.example.crypto.extension.toECKeyPair
-import com.example.model.*
+import com.example.model.PrivateKey
+import com.example.model.SignatureData
 import com.example.model.extension.toHexString
+import com.example.model.toAddress
+import com.example.model.toEthereumAddress
+import com.example.model.toHex
 import org.junit.Test
 import org.komputing.khex.extensions.hexToByteArray
 import org.komputing.khex.model.HexString
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class SignTest {
@@ -58,9 +63,28 @@ class SignTest {
     }
 
     @Test
-    fun `new keypair`() {
-        val keypair = createKeyPair(true)
-        println(keypair.privateKey.key.toHexString())
+    fun `generate address for sm2p256v1`() {
+        val isGM = true
+        val privateKey = "0x9860956de90cc61a05447ea067197be1fa08d712c4a5088c9cb62182bdca0f92"
+        val keypair = PrivateKey(HexString(privateKey)).toECKeyPair(isGM)
+        println(keypair.publicKey.key.toHexString())
+        val actual = keypair.publicKey.toAddress(isGM).address
+        val expected = "zltc_oJCrxCx6X23m5xVZFLjexi8GGaib6Zwff"
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `generate address for secp256k1`() {
+        val isGM = false
+        val privateKey = "0xd2c784688ab85d689e358a7b030c9f26b8ee45e66e89d8842fa88da3b9637955"
+        val keypair = PrivateKey(HexString(privateKey)).toECKeyPair(isGM)
+        assertEquals(
+            keypair.publicKey.key.toHexString(),
+            "0x31dc027c63ccb1229cae4a8f138b53c14f7989323e8cded430b54cf3ef9ddf5e348458706a05ab6c7597fc2b190adb2479e0cb635d92c9e5e92c396fae998bd6"
+        )
+        val actual = keypair.publicKey.toAddress(isGM)
+        val expected = "zltc_cWAvRSgCKgfyp5Rz5TH8srmrZsH5fVYpg"
+        assertEquals(expected, actual.address)
     }
 
     @Test
