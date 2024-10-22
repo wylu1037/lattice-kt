@@ -88,6 +88,18 @@ class MnemonicTest {
     }
 
     @Test
+    fun `derive child keypair for secp256k1`() {
+        val isGM = false
+        val mnemonic = Mnemonic("lumber govern solution proof then ticket wedding office secret reason essay child")
+        val key = mnemonic.toMnemonicWords().toExtendedKey("m/44'/60'/0'/0/1", "Root1234", isGM)
+        val privateKey = key.keyPair.privateKey.key.toHexString()
+        val publicKey = key.keyPair.getCompressedPublicKey(isGM).toHexString()
+        val address = key.keyPair.toAddress(isGM).address
+        
+        assertEquals("0xc37c811a558ef15c898c857b7aa616135fb3579251d396cf3a01a7ce4bb14188", privateKey)
+    }
+
+    @Test
     fun `mnemonic to keypair for sm2p256v1`() {
         val isGM = true
         val mnemonic = Mnemonic("笔 余 罩 老 配 速 历 在 联 烧 拨 郎")
