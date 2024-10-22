@@ -1,10 +1,10 @@
 <h1 align="center">Lattice Kotlin</h1>
 
 <p align="center">
-    <a href="#rust">kotlin</a>  &#xa0; | &#xa0;
-    <a href="#blockchain">blockchain</a>  &#xa0; | &#xa0;
-    <a href="#contract">contract</a>  &#xa0; | &#xa0;
-    <a href="wasm">wasm</a>
+    <img alt="Static Badge" src="https://img.shields.io/badge/kotlin-v1.9.23-blue?logo=kotlin">
+    <img alt="Static Badge" src="https://img.shields.io/badge/build-passing-green?logo=github">
+    <img alt="Static Badge" src="https://img.shields.io/badge/release-v1.0.0-blue?logo=adguard">
+    <img alt="Static Badge" src="https://img.shields.io/badge/Evm-support-orange?logo=ethereum">
 </p>
 
 <h1>Intro</h1>
