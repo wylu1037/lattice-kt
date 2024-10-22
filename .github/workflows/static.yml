@@ -37,7 +37,7 @@ jobs:
           java-version: 17
           distribution: temurin
       - name: Setup Gradle
-        uses: gradle/setup-gradle@v3
+        uses: gradle/gradle-build-action@v2
       - name: Run Dokka with Gradle
         run: ./gradlew dokkaHtmlMultiModule
       - name: Setup Pages
