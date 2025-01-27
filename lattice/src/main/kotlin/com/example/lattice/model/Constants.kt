@@ -1,7 +1,16 @@
 package com.example.lattice.model
 
-import com.example.lattice.model.TxTypeEnum.*
-import com.example.lattice.model.TxVersionEnum.*
+import com.example.lattice.model.TxTypeEnum.CONTRACT
+import com.example.lattice.model.TxTypeEnum.CREATE
+import com.example.lattice.model.TxTypeEnum.EXECUTE
+import com.example.lattice.model.TxTypeEnum.GENESIS
+import com.example.lattice.model.TxTypeEnum.RECEIVE
+import com.example.lattice.model.TxTypeEnum.SEND
+import com.example.lattice.model.TxTypeEnum.UPDATE
+import com.example.lattice.model.TxVersionEnum.CHAOS
+import com.example.lattice.model.TxVersionEnum.LATEST
+import com.example.lattice.model.TxVersionEnum.NUWA
+import com.example.lattice.model.TxVersionEnum.PANGU
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 internal val APPLICATION_JSON = "application/json; charset=utf-8".toMediaTypeOrNull()

@@ -2,7 +2,14 @@ package com.example.lattice.provider
 
 import com.example.lattice.gson
 import com.example.lattice.logger
-import com.example.lattice.model.*
+import com.example.lattice.model.APPLICATION_JSON
+import com.example.lattice.model.Balance
+import com.example.lattice.model.BaseRequest
+import com.example.lattice.model.JsonRpcPayload
+import com.example.lattice.model.JsonRpcResponse
+import com.example.lattice.model.Transaction
+import com.example.lattice.model.toBody
+import com.example.lattice.model.toSendTBlock
 import com.example.model.Address
 import com.example.model.block.CurrentTDBlock
 import com.example.model.block.Receipt
@@ -62,14 +69,9 @@ fun post(request: BaseRequest): Response {
 
 /**
  * @param url url
- * @param chainId 链ID
  * @param token jwt token
  */
-data class HttpApiParams(val url: URL, val chainId: Int, var token: String? = null)
-
-fun HttpApiParams.chainIdAsString(): String {
-    return chainId.toString()
-}
+data class HttpApiParams(val url: URL, var token: String? = null)
 
 interface HttpApi {
     /**
@@ -84,14 +86,14 @@ interface HttpApi {
      * @param address 账户地址 [Address]
      * @return [Balance] 余额
      */
-    fun getBalanceWithPending(address: Address): Balance
+    fun getBalanceWithPending(chainId: String, address: Address): Balance
 
     /**
      * 获取创世区块
      *
      * @return 创建区块 [TBlock]
      */
-    fun getGenesis(): TBlock
+    fun getGenesis(chainId: String): TBlock
 
     /**
      * 获取账户最新的区块信息
@@ -99,7 +101,7 @@ interface HttpApi {
      * @param address 账户地址 [Address]
      * @return 区块信息 [CurrentTDBlock]
      */
-    fun getLatestBlock(address: Address): CurrentTDBlock
+    fun getLatestBlock(chainId: String, address: Address): CurrentTDBlock
 
     /**
      * 获取账户最新的区块信息，失败则获取创世区块信息
@@ -107,7 +109,7 @@ interface HttpApi {
      * @param address 账户地址 [Address]
      * @return [CurrentTDBlock] 区块信息
      */
-    fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock
+    fun getLatestTDBlockWithCatch(chainId: String, address: Address): CurrentTDBlock
 
     /**
      * 发送已签名的交易到链上
@@ -115,7 +117,7 @@ interface HttpApi {
      * @param signedTx 已经签名的交易
      * @return 交易哈希
      */
-    fun sendRawTBlock(signedTx: Transaction): String
+    fun sendRawTBlock(chainId: String, signedTx: Transaction): String
 
     /**
      * 获取交易的回执信息
@@ -123,7 +125,7 @@ interface HttpApi {
      * @param hash 交易哈希
      * @return [Receipt] 交易回执
      */
-    fun getReceipt(hash: String): Receipt
+    fun getReceipt(chainId: String, hash: String): Receipt
 
     /**
      * 预执行合约
@@ -131,9 +133,22 @@ interface HttpApi {
      * @param unsignedTx 未签名的交易 [Transaction]
      * @return 交易回执 [Receipt]
      */
-    fun preCallContract(unsignedTx: Transaction): Receipt
+    fun preCallContract(chainId: String, unsignedTx: Transaction): Receipt
 }
 
+data class ChainId(val id: String)
+
+fun ChainId.isValid(): Boolean {
+    if (id.isBlank()) {
+        return false
+    }
+    val regex = Regex("^[1-9]\\d*$")
+    return regex.matches(id)
+}
+
+fun emptyChainId(): String {
+    return ""
+}
 
 class HttpApiImpl(params: HttpApiParams) : HttpApi {
 
@@ -147,10 +162,10 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
      * @param params 方法参数
      * @return T generic
      */
-    private inline fun <reified T : Any> sendUseJsonRpc(method: String, params: Array<Any>): T {
-        logger.debug("开始发起json-rpc请求，method: $method, params: ${params.contentToString()}")
+    private inline fun <reified T : Any> sendUseJsonRpc(chainId: ChainId, method: String, params: Array<Any>): T {
+        logger.debug("开始发起json-rpc请求，chainId: ${chainId.id}, method: $method, params: ${params.contentToString()}")
         val headers = mutableMapOf<String, String>().apply {
-            put("chainId", _params.chainIdAsString())
+            put("chainId", if (chainId.isValid()) chainId.id else emptyChainId())
             _params.token?.let { token ->
                 put("Authorization", "Bearer $token")
             }
@@ -169,38 +184,38 @@ class HttpApiImpl(params: HttpApiParams) : HttpApi {
         _params.token = newToken
     }
 
-    override fun getBalanceWithPending(address: Address): Balance {
-        return sendUseJsonRpc("latc_getBalanceWithPending", arrayOf(address.address))
+    override fun getBalanceWithPending(chainId: String, address: Address): Balance {
+        return sendUseJsonRpc(ChainId(chainId), "latc_getBalanceWithPending", arrayOf(address.address))
     }
 
-    override fun getGenesis(): TBlock {
-        return sendUseJsonRpc("latc_getGenesis", emptyArray())
+    override fun getGenesis(chainId: String): TBlock {
+        return sendUseJsonRpc(ChainId(chainId), "latc_getGenesis", emptyArray())
     }
 
-    override fun getLatestBlock(address: Address): CurrentTDBlock {
-        return sendUseJsonRpc("latc_getCurrentTBDB", arrayOf(address.address))
+    override fun getLatestBlock(chainId: String, address: Address): CurrentTDBlock {
+        return sendUseJsonRpc(ChainId(chainId), "latc_getCurrentTBDB", arrayOf(address.address))
     }
 
-    override fun getLatestTDBlockWithCatch(address: Address): CurrentTDBlock {
+    override fun getLatestTDBlockWithCatch(chainId: String, address: Address): CurrentTDBlock {
         return try {
-            getLatestBlock(address)
+            getLatestBlock(chainId, address)
         } catch (e: Error) {
-            getGenesis().toCurrentTDBlock()
+            getGenesis(chainId).toCurrentTDBlock()
         }
     }
 
-    override fun sendRawTBlock(signedTx: Transaction): String {
+    override fun sendRawTBlock(chainId: String, signedTx: Transaction): String {
         if (signedTx.sign.isNullOrBlank()) {
             throw Error("Property sign must not be null")
         }
-        return sendUseJsonRpc("wallet_sendRawTBlock", arrayOf(signedTx.toSendTBlock()))
+        return sendUseJsonRpc(ChainId(chainId), "wallet_sendRawTBlock", arrayOf(signedTx.toSendTBlock()))
     }
 
-    override fun getReceipt(hash: String): Receipt {
-        return sendUseJsonRpc("latc_getReceipt", arrayOf(hash))
+    override fun getReceipt(chainId: String, hash: String): Receipt {
+        return sendUseJsonRpc(ChainId(chainId), "latc_getReceipt", arrayOf(hash))
     }
 
-    override fun preCallContract(unsignedTx: Transaction): Receipt {
-        return sendUseJsonRpc("wallet_preExecuteContract", arrayOf(unsignedTx.toSendTBlock()))
+    override fun preCallContract(chainId: String, unsignedTx: Transaction): Receipt {
+        return sendUseJsonRpc(ChainId(chainId), "wallet_preExecuteContract", arrayOf(unsignedTx.toSendTBlock()))
     }
 }

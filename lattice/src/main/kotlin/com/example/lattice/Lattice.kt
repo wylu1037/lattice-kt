@@ -2,7 +2,9 @@ package com.example.lattice
 
 import com.example.lattice.Curve.Secp256k1
 import com.example.lattice.Curve.Sm2p256v1
-import com.example.lattice.Strategy.*
+import com.example.lattice.Strategy.BACK_OFF
+import com.example.lattice.Strategy.FIXED_INTERVAL
+import com.example.lattice.Strategy.RANDOM_INTERVAL
 import com.example.lattice.model.sign
 import com.example.lattice.provider.HttpApiImpl
 import com.example.lattice.provider.HttpApiParams
@@ -133,7 +135,7 @@ interface Lattice {
      * @param joule 交易的手续费
      * @return 哈希
      */
-    fun transfer(linker: String, payload: String = "0x", amount: Long = 0, joule: Long = 0): String
+    fun transfer(chainId: String, linker: String, payload: String = "0x", amount: Long = 0, joule: Long = 0): String
 
     /**
      * 发起转账并等待回执
@@ -146,6 +148,7 @@ interface Lattice {
      * @return 回执[Receipt]
      */
     fun transferWaitReceipt(
+        chainId: String,
         linker: String,
         payload: String = "0x",
         amount: Long = 0,
@@ -162,7 +165,7 @@ interface Lattice {
      * @param joule 交易的手续费
      * @return 哈希
      */
-    fun deployContract(data: String, payload: String = "0x", amount: Long = 0, joule: Long = 0): String
+    fun deployContract(chainId: String, data: String, payload: String = "0x", amount: Long = 0, joule: Long = 0): String
 
     /**
      * 部署合约并等待回执
@@ -175,6 +178,7 @@ interface Lattice {
      * @return 回执[Receipt]
      */
     fun deployContractWaitReceipt(
+        chainId: String,
         data: String,
         payload: String = "0x",
         amount: Long = 0,
@@ -193,6 +197,7 @@ interface Lattice {
      * @return 哈希
      */
     fun callContract(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String = "0x",
@@ -212,6 +217,7 @@ interface Lattice {
      * @return 回执[Receipt]
      */
     fun callContractWaitReceipt(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String = "0x",
@@ -231,6 +237,7 @@ interface Lattice {
      * @return 回执[Receipt]
      */
     fun preCallContract(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String = "0x",
@@ -252,11 +259,18 @@ class LatticeImpl(
     private val _options = options
 
     // initialize a private http api
-    private val _httpApi = HttpApiImpl(HttpApiParams(URL(_connectingNodeConfig.url), chainConfig.chainId))
+    private val _httpApi = HttpApiImpl(HttpApiParams(URL(_connectingNodeConfig.url)))
 
-    override fun transfer(linker: String, payload: String, amount: Long, joule: Long): String {
-        logger.debug("开始发起转账交易，linker: {}, payload: {}, amount: {}, joule: {}", linker, payload, amount, joule)
-        val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
+    override fun transfer(chainId: String, linker: String, payload: String, amount: Long, joule: Long): String {
+        logger.debug(
+            "开始发起转账交易，chainId:{}, linker: {}, payload: {}, amount: {}, joule: {}",
+            chainId,
+            linker,
+            payload,
+            amount,
+            joule
+        )
+        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
         val transaction = TransferTXBuilder.builder()
             .setBlock(block)
             .setOwner(Address(_credentialConfig.accountAddress))
@@ -269,33 +283,41 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        val hash = _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(chainId, transaction)
         logger.debug("结束转账交易，交易哈希为：{}", hash)
         return hash
     }
 
     override fun transferWaitReceipt(
+        chainId: String,
         linker: String,
         payload: String,
         amount: Long,
         joule: Long,
         retryPolicy: RetryPolicy<Throwable>
     ): Receipt {
-        val hash = transfer(linker, payload, amount, joule)
+        val hash = transfer(chainId, linker, payload, amount, joule)
 
         logger.debug("获取交易【{}】的回执", hash)
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(hash)
+                _httpApi.getReceipt(chainId, hash)
             }
         }
         logger.debug("获取到交易【{}】的回执为：{}", hash, gson.toJson(receipt))
         return receipt
     }
 
-    override fun deployContract(data: String, payload: String, amount: Long, joule: Long): String {
-        logger.debug("开始发起部署合约交易，data: {}, payload: {}, amount: {}, joule: {}", data, payload, amount, joule)
-        val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
+    override fun deployContract(chainId: String, data: String, payload: String, amount: Long, joule: Long): String {
+        logger.debug(
+            "开始发起部署合约交易，chainId:{}, data: {}, payload: {}, amount: {}, joule: {}",
+            chainId,
+            data,
+            payload,
+            amount,
+            joule
+        )
+        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
         val transaction = DeployContractTXBuilder.builder()
             .setBlock(block)
             .setOwner(Address(_credentialConfig.accountAddress))
@@ -309,29 +331,31 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        val hash = _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(chainId, transaction)
         logger.debug("结束部署合约，交易哈希为：{}", hash)
         return hash
     }
 
     override fun deployContractWaitReceipt(
+        chainId: String,
         data: String,
         payload: String,
         amount: Long,
         joule: Long,
         retryPolicy: RetryPolicy<Throwable>
     ): Receipt {
-        val hash = deployContract(data, payload, amount, joule)
+        val hash = deployContract(chainId, data, payload, amount, joule)
 
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(hash)
+                _httpApi.getReceipt(chainId, hash)
             }
         }
         return receipt
     }
 
     override fun callContract(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String,
@@ -339,10 +363,10 @@ class LatticeImpl(
         joule: Long
     ): String {
         logger.debug(
-            "开始发起调用合约交易，contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
-            contractAddress, data, payload, amount, joule
+            "开始发起调用合约交易，chainId:{}, contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
+            chainId, contractAddress, data, payload, amount, joule
         )
-        val block = _httpApi.getLatestBlock(Address(_credentialConfig.accountAddress))
+        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
         val transaction = CallContractTXBuilder.builder()
             .setBlock(block)
             .setOwner(Address(_credentialConfig.accountAddress))
@@ -356,12 +380,13 @@ class LatticeImpl(
         val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
         transaction.sign = signature.toHex()
 
-        val hash = _httpApi.sendRawTBlock(transaction)
+        val hash = _httpApi.sendRawTBlock(chainId, transaction)
         logger.debug("结束调用合约，交易哈希为：{}", hash)
         return hash
     }
 
     override fun callContractWaitReceipt(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String,
@@ -369,17 +394,18 @@ class LatticeImpl(
         joule: Long,
         retryPolicy: RetryPolicy<Throwable>
     ): Receipt {
-        val hash = callContract(contractAddress, data, payload, amount, joule)
+        val hash = callContract(chainId, contractAddress, data, payload, amount, joule)
 
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(hash)
+                _httpApi.getReceipt(chainId, hash)
             }
         }
         return receipt
     }
 
     override fun preCallContract(
+        chainId: String,
         contractAddress: String,
         data: String,
         payload: String,
@@ -387,8 +413,8 @@ class LatticeImpl(
         joule: Long
     ): Receipt {
         logger.debug(
-            "开始发起预执行合约交易，contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
-            contractAddress, data, payload, amount, joule
+            "开始发起预执行合约交易，chainId: {}, contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
+            chainId, contractAddress, data, payload, amount, joule
         )
         val transaction = CallContractTXBuilder.builder()
             .setBlock(CurrentTDBlock.zeroBlock())
@@ -400,7 +426,7 @@ class LatticeImpl(
             .setJoule(joule)
             .build()
 
-        val receipt = _httpApi.preCallContract(transaction)
+        val receipt = _httpApi.preCallContract(chainId, transaction)
         logger.debug("结束预调用合约，回执为：{}", gson.toJson(receipt))
         return receipt
     }
