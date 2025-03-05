@@ -6,9 +6,18 @@ import kotlin.test.Test
 
 class LatticeAbiTest {
 
-    private val abi =
-        "[{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolSuite\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"addProtocol\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"}],\"name\":\"getAddress\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Protocol[]\",\"name\":\"protocol\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"name\":\"updateProtocol\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"getTraceability\",\"outputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"number\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"protocol\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"updater\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"}],\"internalType\":\"struct credibilidity.Evidence[]\",\"name\":\"evi\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"setDataSecret\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"name\":\"writeTraceability\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint64\",\"name\":\"protocolUri\",\"type\":\"uint64\"},{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"},{\"internalType\":\"bytes32[]\",\"name\":\"data\",\"type\":\"bytes32[]\"},{\"internalType\":\"address\",\"name\":\"address\",\"type\":\"address\"}],\"internalType\":\"struct Business.batch[]\",\"name\":\"bt\",\"type\":\"tuple[]\"}],\"name\":\"writeTraceabilityBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+    companion object {
+        const val LEDGER_ABI_FILENAME = "ledgerContract.json"
+    }
 
+    object ResourceUtils {
+        fun readFileContent(fileName: String): String {
+            return ResourceUtils::class.java.classLoader.getResourceAsStream(fileName)?.use {
+                it.bufferedReader().readText()
+            } ?: throw IllegalArgumentException("File not found: $fileName")
+        }
+    }
+    
     @Test
     fun `encode writeTraceability`() {
         val args = arrayOf<Any>(
@@ -17,6 +26,7 @@ class LatticeAbiTest {
             arrayOf("0x0900000000000000000000000000000000000000000000000000000000000000"),
             "0x561717f7922a233720ae38acaa4174cda0bf1766"
         )
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("writeTraceability").encode(args)
         val expected =
             "0x4131ff53000000000000000000000000000000000000000000000000000000000000271100000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000100000000000000000000000000561717f7922a233720ae38acaa4174cda0bf1766000000000000000000000000000000000000000000000000000000000000004230783531363438326232383830373231313439663735633961656133623661366137303030323263373835363166366532326662643064346637336535653734333200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010900000000000000000000000000000000000000000000000000000000000000"
@@ -28,6 +38,7 @@ class LatticeAbiTest {
     fun `decode writeTraceability`() {
         val rawCode =
             "0x000000000000000000000000000000000000000000000000000000000000271100000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000100000000000000000000000000561717f7922a233720ae38acaa4174cda0bf1766000000000000000000000000000000000000000000000000000000000000004230783531363438326232383830373231313439663735633961656133623661366137303030323263373835363166366532326662643064346637336535653734333200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010900000000000000000000000000000000000000000000000000000000000000"
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("writeTraceability").decode(rawCode)
         println(code)
     }
@@ -38,6 +49,7 @@ class LatticeAbiTest {
             "0x516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e7432",
             "0x561717f7922a233720ae38acaa4174cda0bf1766",
         )
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("setDataSecret").encode(args)
         val expected =
             "0xa2ec96570000000000000000000000000000000000000000000000000000000000000040000000000000000000000000561717f7922a233720ae38acaa4174cda0bf17660000000000000000000000000000000000000000000000000000000000000042307835313634383262323838303732313134396637356339616561336236613661373030303232633738353631663665323266626430643466373365356537343332000000000000000000000000000000000000000000000000000000000000"
@@ -48,6 +60,7 @@ class LatticeAbiTest {
     fun `decode setDataSecret`() {
         val expected =
             "0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000561717f7922a233720ae38acaa4174cda0bf17660000000000000000000000000000000000000000000000000000000000000042307835313634383262323838303732313134396637356339616561336236613661373030303232633738353631663665323266626430643466373365356537343332000000000000000000000000000000000000000000000000000000000000"
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("setDataSecret").decode(expected)
         assertEquals(expected, code)
     }
@@ -60,6 +73,7 @@ class LatticeAbiTest {
         )
         val expected =
             "0x295adafb0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000561717f7922a233720ae38acaa4174cda0bf176600000000000000000000000000000000000000000000000000000000000000043132333400000000000000000000000000000000000000000000000000000000"
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("getTraceability").encode(args)
         assertEquals(expected, code)
     }
@@ -78,6 +92,7 @@ class LatticeAbiTest {
         )
         val expected =
             "0x77b34b730000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000006a11e3d000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000561717f7922a233720ae38acaa4174cda0bf1766000000000000000000000000000000000000000000000000000000000000000473747230000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e7432"
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("writeTraceabilityBatch").encode(args)
         assertEquals(expected, code)
     }
@@ -102,6 +117,7 @@ class LatticeAbiTest {
         )
         val expected =
             "0x77b34b7300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000006a11e3d000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000561717f7922a233720ae38acaa4174cda0bf1766000000000000000000000000000000000000000000000000000000000000000473747230000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e74320000000000000000000000000000000000000000000000000000000006a11e3d000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000561717f7922a233720ae38acaa4174cda0bf1766000000000000000000000000000000000000000000000000000000000000000473747230000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001516482b2880721149f75c9aea3b6a6a700022c78561f6e22fbd0d4f73e5e7432"
+        val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("writeTraceabilityBatch").encode(args)
         println(code)
         assertEquals(expected, code)
