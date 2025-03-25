@@ -72,7 +72,6 @@ subprojects {
             dependency "com.michael-bull.kotlin-retry:kotlin-retry:${retry_version}"
             dependency "org.slf4j:slf4j-api:${slf4j_version}"
             dependency "ch.qos.logback:logback-classic:${logback_version}"
-
         }
     }
 
@@ -90,6 +89,12 @@ subprojects {
     tasks.shadowJar {
         group = "build"
         archiveFileName.set(project.provider { "${project.description}.jar" })
+        dependencies {
+            exclude(dependency('org.slf4j:slf4j-api'))
+            exclude(dependency('com.fasterxml.jackson.core:jackson-annotations'))
+            exclude(dependency('com.fasterxml.jackson.core:jackson-core'))
+            exclude(dependency('com.fasterxml.jackson.core:jackson-databind'))
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import com.example.lattice.Strategy.BACK_OFF
 import com.example.lattice.Strategy.FIXED_INTERVAL
 import com.example.lattice.Strategy.RANDOM_INTERVAL
 import com.example.lattice.model.sign
+import com.example.lattice.provider.HttpApi
 import com.example.lattice.provider.HttpApiImpl
 import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
@@ -21,9 +22,10 @@ import com.github.michaelbull.retry.policy.decorrelatedJitterBackoff
 import com.github.michaelbull.retry.retry
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-var logger = LoggerFactory.getLogger("Lattice")
+var logger: Logger = LoggerFactory.getLogger("Lattice")
 
 internal val gson by lazy {
     Gson()
@@ -125,6 +127,13 @@ class RetryStrategy() {
 }
 
 interface Lattice {
+
+    /**
+     * 获取HttpApi
+     *
+     * @return [HttpApi]
+     */
+    fun getHttpApi(): HttpApi
 
     /**
      * 发起转账
@@ -260,6 +269,10 @@ class LatticeImpl(
 
     // initialize a private http api
     private val _httpApi = HttpApiImpl(HttpApiParams(URL(_connectingNodeConfig.url)))
+
+    override fun getHttpApi(): HttpApi {
+        return _httpApi
+    }
 
     override fun transfer(chainId: String, linker: String, payload: String, amount: Long, joule: Long): String {
         logger.debug(
