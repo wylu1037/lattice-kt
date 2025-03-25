@@ -406,7 +406,11 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         }
 
         type == Types.TUPLE.value -> {
-            val array = arg as Array<*>
+            val array = when (arg) {
+                is Array<*> -> arg
+                is Collection<*> -> arg.toTypedArray()
+                else -> throw IllegalArgumentException("Invalid argument type, arg must be either an Array or a Collection")
+            }
             val components = namedType.components
                 ?: throw IllegalArgumentException("Invalid argument type, Tuple components can not be null")
             val convertedArgs = array.mapIndexed { index, value ->
@@ -417,14 +421,22 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
 
         // 动态数组：dynamic array (tuple)
         type.matches(Regex(SOL_DYNAMIC_ARRAY_REGEX)) -> {
-            val array = arg as Array<*>
+            val array = when (arg) {
+                is Array<*> -> arg
+                is Collection<*> -> arg.toTypedArray()
+                else -> throw IllegalArgumentException("Invalid argument type, arg must be either an Array or a Collection")
+            }
             return when (val childrenType = dynamicArrayElemType(type)) {
                 Types.TUPLE.value -> {
                     val components = namedType.components
                         ?: throw IllegalArgumentException("Invalid argument type, Tuple components can not be null")
                     val tupleArgs = mutableListOf<DynamicStruct>()
                     for (item in array) {
-                        val arr = item as Array<*>
+                        val arr = when (item) {
+                            is Array<*> -> item
+                            is Collection<*> -> item.toTypedArray()
+                            else -> throw IllegalArgumentException("Invalid argument type, arg must be either an Array or a Collection")
+                        }
                         val convertedArgs = arr.mapIndexed { index, it ->
                             convertArgument(components[index], it)
                         }.toMutableList()
@@ -444,7 +456,11 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
         // fixme web3j have a bug with static array
         // 静态数组：fixed array
         type.matches(Regex(SOL_FIXED_ARRAY_REGEX)) -> {
-            val array = arg as Array<*>
+            val array = when (arg) {
+                is Array<*> -> arg
+                is Collection<*> -> arg.toTypedArray()
+                else -> throw IllegalArgumentException("Invalid argument type, arg must be either an Array or a Collection")
+            }
             val ty = fixedArrayElemType(type)
             val size = fixedArraySize(type)
             val convertedArgs = FixedArray(

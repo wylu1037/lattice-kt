@@ -2,10 +2,14 @@ package com.example.lattice.model
 
 import com.example.crypto.extension.toECKeyPair
 import com.example.crypto.signMessage
-import com.example.model.*
+import com.example.model.Address
+import com.example.model.HEX_PREFIX
+import com.example.model.PrivateKey
+import com.example.model.SignatureData
 import com.example.model.block.SendTBlock
 import com.example.model.extension.hash
 import com.example.model.extension.toByteArray
+import com.example.model.toEthereumAddress
 import com.example.rlp.RLPList
 import com.example.rlp.encode
 import com.example.rlp.toRLP
@@ -86,7 +90,6 @@ fun Transaction.sign(
  * @param useProofOfWork 默认false
  * @return Pair<pow, hash> [Pair]
  */
-@OptIn(ExperimentalStdlibApi::class)
 fun Transaction.hash(isGM: Boolean = true, chainId: Int = 1, useProofOfWork: Boolean = false): Pair<String, ByteArray> {
     val codeHash = if (!code.isNullOrBlank()) {
         if (codeHash.isNullOrBlank()) {

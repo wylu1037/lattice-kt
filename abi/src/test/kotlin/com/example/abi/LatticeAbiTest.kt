@@ -17,7 +17,7 @@ class LatticeAbiTest {
             } ?: throw IllegalArgumentException("File not found: $fileName")
         }
     }
-    
+
     @Test
     fun `encode writeTraceability`() {
         val args = arrayOf<Any>(

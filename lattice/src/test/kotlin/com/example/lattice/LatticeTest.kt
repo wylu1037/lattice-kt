@@ -40,10 +40,10 @@ internal const val HTTP_URL = "http://192.168.1.185:13000"
 
 internal val lattice = LatticeImpl(
     ChainConfig(chainId = 1, curve = Curve.Sm2p256v1, tokenLess = true),
-    ConnectingNodeConfig("http://192.168.1.185:13000"),
+    ConnectingNodeConfig(HTTP_URL),
     CredentialConfig(
-        accountAddress = "zltc_dS73XWcJqu2uEk4cfWsX8DDhpb9xsaH9s",
-        privateKey = "0xdbd91293f324e5e49f040188720c6c9ae7e6cc2b4c5274120ee25808e8f4b6a7"
+        accountAddress = "zltc_j5yLhxm8fkwJkuhapqmqmJ1vYY2gLfPLy",
+        privateKey = "0x88d80c38a8a10e03b54c2c2234e90d9809030a78e4fd2f99a6a189629b530f90"
     ),
 )
 
@@ -62,7 +62,7 @@ class LatticeTest {
 
     @Test
     fun `transfer wait receipt`() {
-        val receipt = lattice.transferWaitReceipt("zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD", "0x01")
+        val receipt = lattice.transferWaitReceipt(CHAIN_ID.toString(), "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD", "0x01")
         assertNotNull(receipt)
     }
 
