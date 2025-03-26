@@ -10,4 +10,4 @@ data class LatticeAbi(val abi: String) {
 
 fun LatticeAbi.getFunction(methodName: String) = LatticeFunction(abi, methodName, getMethods().filter(methodName))
 
-fun LatticeAbi.getConstructor() = LatticeFunction(abi, null, getMethods().filter())
+fun LatticeAbi.getConstructor() = LatticeFunction(abi, null, getMethods().first { it.isConstructor() })
