@@ -48,7 +48,8 @@ internal val lattice = LatticeImpl(
         accountAddress = "zltc_j5yLhxm8fkwJkuhapqmqmJ1vYY2gLfPLy",
         privateKey = "0x88d80c38a8a10e03b54c2c2234e90d9809030a78e4fd2f99a6a189629b530f90"
     ),
-    newAccountLock()
+    newAccountLock(),
+    BlockCacheImpl()
 )
 
 internal const val LEDGER_ABI =
@@ -70,7 +71,7 @@ class LatticeTest {
         val payload = "0x01"
         runBlocking {
             val jobs = mutableListOf<Job>()
-            for (i in 1..10) {
+            for (i in 1..10000) {
                 val job = launch(Dispatchers.Default) {
                     lattice.transfer(CHAIN_ID.toString(), linker, payload)
                 }

@@ -20,4 +20,14 @@ data class CurrentTDBlock(
             )
         }
     }
+
+    /**
+     * 更新交易哈希 并 自增账户高度
+     *
+     * @param hash 交易哈希
+     */
+    fun update(hash: String) {
+        currentTBlockHash = hash
+        currentTBlockNumber++
+    }
 }

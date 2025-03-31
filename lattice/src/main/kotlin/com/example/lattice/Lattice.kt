@@ -5,6 +5,7 @@ import com.example.lattice.Curve.Sm2p256v1
 import com.example.lattice.Strategy.BACK_OFF
 import com.example.lattice.Strategy.FIXED_INTERVAL
 import com.example.lattice.Strategy.RANDOM_INTERVAL
+import com.example.lattice.model.Transaction
 import com.example.lattice.model.sign
 import com.example.lattice.provider.HttpApi
 import com.example.lattice.provider.HttpApiImpl
@@ -260,10 +261,22 @@ class LatticeImpl(
     private val connectingNodeConfig: ConnectingNodeConfig,
     private val credentialConfig: CredentialConfig,
     private val accountLock: AccountLock,
+    private val blockCache: BlockCache,
     private val options: Options? = null
 ) : Lattice {
 
     private val httpApi = HttpApiImpl(HttpApiParams(URL(connectingNodeConfig.url)))
+
+    private fun handleTransaction(chainId: String, transaction: Transaction, block: CurrentTDBlock): String {
+        val (_, signature) = transaction.sign(credentialConfig.privateKey, chainConfig.isGM(), chainConfig.chainId)
+        transaction.sign = signature.toHex()
+
+        val hash = httpApi.sendRawTBlock(chainId, transaction)
+        block.update(hash)
+        blockCache.put(chainId, credentialConfig.accountAddress, block)
+
+        return hash
+    }
 
     override fun getHttpApi(): HttpApi {
         return httpApi
@@ -280,7 +293,8 @@ class LatticeImpl(
         )
 
         val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
-            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            //val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val block = blockCache.get(chainId, credentialConfig.accountAddress, httpApi::getLatestBlock)
             val transaction = TransferTXBuilder.builder()
                 .setBlock(block)
                 .setOwner(Address(credentialConfig.accountAddress))
@@ -290,14 +304,7 @@ class LatticeImpl(
                 .setJoule(joule)
                 .build()
 
-            val (_, signature) = transaction.sign(
-                credentialConfig.privateKey,
-                chainConfig.isGM(),
-                chainConfig.chainId
-            )
-            transaction.sign = signature.toHex()
-
-            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            val hash = handleTransaction(chainId, transaction, block)
             logger.debug("结束转账交易，交易哈希为：{}", hash)
             hash
         }
@@ -336,7 +343,8 @@ class LatticeImpl(
         )
 
         val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
-            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            //val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val block = blockCache.get(chainId, credentialConfig.accountAddress, httpApi::getLatestBlock)
             val transaction = DeployContractTXBuilder.builder()
                 .setBlock(block)
                 .setOwner(Address(credentialConfig.accountAddress))
@@ -347,10 +355,7 @@ class LatticeImpl(
                 .setJoule(joule)
                 .build()
 
-            val (_, signature) = transaction.sign(credentialConfig.privateKey, chainConfig.isGM(), chainConfig.chainId)
-            transaction.sign = signature.toHex()
-
-            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            val hash = handleTransaction(chainId, transaction, block)
             logger.debug("结束部署合约，交易哈希为：{}", hash)
             hash
         }
@@ -389,7 +394,8 @@ class LatticeImpl(
         )
 
         val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
-            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            // val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val block = blockCache.get(chainId, credentialConfig.accountAddress, httpApi::getLatestBlock)
             val transaction = CallContractTXBuilder.builder()
                 .setBlock(block)
                 .setOwner(Address(credentialConfig.accountAddress))
@@ -400,10 +406,7 @@ class LatticeImpl(
                 .setJoule(joule)
                 .build()
 
-            val (_, signature) = transaction.sign(credentialConfig.privateKey, chainConfig.isGM(), chainConfig.chainId)
-            transaction.sign = signature.toHex()
-
-            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            val hash = handleTransaction(chainId, transaction, block)
             logger.debug("结束调用合约，交易哈希为：{}", hash)
             hash
         }
