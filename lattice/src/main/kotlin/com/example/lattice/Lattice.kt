@@ -256,22 +256,17 @@ interface Lattice {
 }
 
 class LatticeImpl(
-    chainConfig: ChainConfig,
-    connectingNodeConfig: ConnectingNodeConfig,
-    credentialConfig: CredentialConfig,
-    options: Options? = null
+    private val chainConfig: ChainConfig,
+    private val connectingNodeConfig: ConnectingNodeConfig,
+    private val credentialConfig: CredentialConfig,
+    private val accountLock: AccountLock,
+    private val options: Options? = null
 ) : Lattice {
 
-    private val _chainConfig = chainConfig
-    private val _connectingNodeConfig = connectingNodeConfig
-    private val _credentialConfig = credentialConfig
-    private val _options = options
-
-    // initialize a private http api
-    private val _httpApi = HttpApiImpl(HttpApiParams(URL(_connectingNodeConfig.url)))
+    private val httpApi = HttpApiImpl(HttpApiParams(URL(connectingNodeConfig.url)))
 
     override fun getHttpApi(): HttpApi {
-        return _httpApi
+        return httpApi
     }
 
     override fun transfer(chainId: String, linker: String, payload: String, amount: Long, joule: Long): String {
@@ -283,21 +278,30 @@ class LatticeImpl(
             amount,
             joule
         )
-        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
-        val transaction = TransferTXBuilder.builder()
-            .setBlock(block)
-            .setOwner(Address(_credentialConfig.accountAddress))
-            .setLinker(Address(linker))
-            .setPayload(payload)
-            .setAmount(amount)
-            .setJoule(joule)
-            .build()
 
-        val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
-        transaction.sign = signature.toHex()
+        val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
+            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val transaction = TransferTXBuilder.builder()
+                .setBlock(block)
+                .setOwner(Address(credentialConfig.accountAddress))
+                .setLinker(Address(linker))
+                .setPayload(payload)
+                .setAmount(amount)
+                .setJoule(joule)
+                .build()
 
-        val hash = _httpApi.sendRawTBlock(chainId, transaction)
-        logger.debug("结束转账交易，交易哈希为：{}", hash)
+            val (_, signature) = transaction.sign(
+                credentialConfig.privateKey,
+                chainConfig.isGM(),
+                chainConfig.chainId
+            )
+            transaction.sign = signature.toHex()
+
+            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            logger.debug("结束转账交易，交易哈希为：{}", hash)
+            hash
+        }
+
         return hash
     }
 
@@ -314,7 +318,7 @@ class LatticeImpl(
         logger.debug("获取交易【{}】的回执", hash)
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(chainId, hash)
+                httpApi.getReceipt(chainId, hash)
             }
         }
         logger.debug("获取到交易【{}】的回执为：{}", hash, gson.toJson(receipt))
@@ -330,22 +334,26 @@ class LatticeImpl(
             amount,
             joule
         )
-        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
-        val transaction = DeployContractTXBuilder.builder()
-            .setBlock(block)
-            .setOwner(Address(_credentialConfig.accountAddress))
-            .setLinker(Address(ZERO_ADDRESS))
-            .setCode(data)
-            .setPayload(payload)
-            .setAmount(amount)
-            .setJoule(joule)
-            .build()
 
-        val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
-        transaction.sign = signature.toHex()
+        val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
+            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val transaction = DeployContractTXBuilder.builder()
+                .setBlock(block)
+                .setOwner(Address(credentialConfig.accountAddress))
+                .setLinker(Address(ZERO_ADDRESS))
+                .setCode(data)
+                .setPayload(payload)
+                .setAmount(amount)
+                .setJoule(joule)
+                .build()
 
-        val hash = _httpApi.sendRawTBlock(chainId, transaction)
-        logger.debug("结束部署合约，交易哈希为：{}", hash)
+            val (_, signature) = transaction.sign(credentialConfig.privateKey, chainConfig.isGM(), chainConfig.chainId)
+            transaction.sign = signature.toHex()
+
+            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            logger.debug("结束部署合约，交易哈希为：{}", hash)
+            hash
+        }
         return hash
     }
 
@@ -361,7 +369,7 @@ class LatticeImpl(
 
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(chainId, hash)
+                httpApi.getReceipt(chainId, hash)
             }
         }
         return receipt
@@ -379,22 +387,26 @@ class LatticeImpl(
             "开始发起调用合约交易，chainId:{}, contractAddress: {}, data: {}, payload: {}, amount: {}, joule: {}",
             chainId, contractAddress, data, payload, amount, joule
         )
-        val block = _httpApi.getLatestBlock(chainId, Address(_credentialConfig.accountAddress))
-        val transaction = CallContractTXBuilder.builder()
-            .setBlock(block)
-            .setOwner(Address(_credentialConfig.accountAddress))
-            .setLinker(Address(contractAddress))
-            .setCode(data)
-            .setPayload(payload)
-            .setAmount(amount)
-            .setJoule(joule)
-            .build()
 
-        val (_, signature) = transaction.sign(_credentialConfig.privateKey, _chainConfig.isGM(), _chainConfig.chainId)
-        transaction.sign = signature.toHex()
+        val hash = accountLock.withLock(chainId, credentialConfig.accountAddress) {
+            val block = httpApi.getLatestBlock(chainId, Address(credentialConfig.accountAddress))
+            val transaction = CallContractTXBuilder.builder()
+                .setBlock(block)
+                .setOwner(Address(credentialConfig.accountAddress))
+                .setLinker(Address(contractAddress))
+                .setCode(data)
+                .setPayload(payload)
+                .setAmount(amount)
+                .setJoule(joule)
+                .build()
 
-        val hash = _httpApi.sendRawTBlock(chainId, transaction)
-        logger.debug("结束调用合约，交易哈希为：{}", hash)
+            val (_, signature) = transaction.sign(credentialConfig.privateKey, chainConfig.isGM(), chainConfig.chainId)
+            transaction.sign = signature.toHex()
+
+            val hash = httpApi.sendRawTBlock(chainId, transaction)
+            logger.debug("结束调用合约，交易哈希为：{}", hash)
+            hash
+        }
         return hash
     }
 
@@ -411,7 +423,7 @@ class LatticeImpl(
 
         val receipt = runBlocking {
             retry(retryPolicy) {
-                _httpApi.getReceipt(chainId, hash)
+                httpApi.getReceipt(chainId, hash)
             }
         }
         return receipt
@@ -431,7 +443,7 @@ class LatticeImpl(
         )
         val transaction = CallContractTXBuilder.builder()
             .setBlock(CurrentTDBlock.zeroBlock())
-            .setOwner(Address(_credentialConfig.accountAddress))
+            .setOwner(Address(credentialConfig.accountAddress))
             .setLinker(Address(contractAddress))
             .setCode(data)
             .setPayload(payload)
@@ -439,7 +451,7 @@ class LatticeImpl(
             .setJoule(joule)
             .build()
 
-        val receipt = _httpApi.preCallContract(chainId, transaction)
+        val receipt = httpApi.preCallContract(chainId, transaction)
         logger.debug("结束预调用合约，回执为：{}", gson.toJson(receipt))
         return receipt
     }

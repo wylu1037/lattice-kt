@@ -22,8 +22,11 @@ import com.example.model.toAddress
 import com.example.model.toEthereumAddress
 import com.example.model.toHex
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.io.File
@@ -36,7 +39,7 @@ internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
 internal const val PRIVATE_KEY_HEX = "0xdbd91293f324e5e49f040188720c6c9ae7e6cc2b4c5274120ee25808e8f4b6a7"
 internal const val IS_GM = true
 internal const val CHAIN_ID = 1
-internal const val HTTP_URL = "http://192.168.1.185:13000"
+internal const val HTTP_URL = "http://192.168.3.51:13000"
 
 internal val lattice = LatticeImpl(
     ChainConfig(chainId = 1, curve = Curve.Sm2p256v1, tokenLess = true),
@@ -45,6 +48,7 @@ internal val lattice = LatticeImpl(
         accountAddress = "zltc_j5yLhxm8fkwJkuhapqmqmJ1vYY2gLfPLy",
         privateKey = "0x88d80c38a8a10e03b54c2c2234e90d9809030a78e4fd2f99a6a189629b530f90"
     ),
+    newAccountLock()
 )
 
 internal const val LEDGER_ABI =
@@ -58,6 +62,22 @@ class LatticeTest {
     fun `get balance`() {
         val balance = httpApi.getBalanceWithPending(Constants.CHAIN_ID, Address(ACCOUNT_ADDRESS_STR))
         println(gson.toJson(balance))
+    }
+
+    @Test
+    fun `concurrent transfer`() {
+        val linker = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
+        val payload = "0x01"
+        runBlocking {
+            val jobs = mutableListOf<Job>()
+            for (i in 1..10) {
+                val job = launch(Dispatchers.Default) {
+                    lattice.transfer(CHAIN_ID.toString(), linker, payload)
+                }
+                jobs.add(job)
+            }
+            jobs.forEach { it.join() }
+        }
     }
 
     @Test

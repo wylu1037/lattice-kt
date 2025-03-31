@@ -30,6 +30,7 @@ class GenerateTransactionsTest {
             accountAddress = Constants.ACCOUNT_ADDRESS,
             privateKey = Constants.PRIVATE_KEY,
         ),
+        newAccountLock()
     )
 
     private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(Constants.HTTP_URL)))
