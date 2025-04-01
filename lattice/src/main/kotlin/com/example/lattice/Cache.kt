@@ -109,6 +109,12 @@ interface BlockCache {
 class BlockCacheImpl(
     private val daemonHashExpiration: Duration = 10.seconds,
 ) : BlockCache {
+    /**
+     * 构造函数(For Java)
+     *
+     * @param daemonHashExpirationSeconds 守护哈希过期时间，单位秒
+     */
+    constructor(daemonHashExpirationSeconds: Int) : this(daemonHashExpirationSeconds.seconds)
 
     private val daemonHashExpireAtMap = ConcurrentHashMap<String, Date>()
 
