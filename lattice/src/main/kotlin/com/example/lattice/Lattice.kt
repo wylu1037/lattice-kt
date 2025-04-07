@@ -445,7 +445,7 @@ class LatticeImpl(
             chainId, contractAddress, data, payload, amount, joule
         )
         val transaction = CallContractTXBuilder.builder()
-            .setBlock(CurrentTDBlock.zeroBlock())
+            .setBlock(CurrentTDBlock.newZeroBlock())
             .setOwner(Address(credentialConfig.accountAddress))
             .setLinker(Address(contractAddress))
             .setCode(data)

@@ -14,6 +14,8 @@ Blockchain sdk that written in Kotlin programming language.
 
 - [x] [Retry](https://github.com/michaelbull/kotlin-retry) A multiplatform higher-order function for retrying operations
   that may fail.
+- [x] [http4k](https://github.com/http4k/http4k) The Functional toolkit for Kotlin HTTP applications. http4k provides a
+  simple and uniform way to serve, consume, and test HTTP services.
 
 <h1 id="WebAssembly ">WebAssembly</h1>
 

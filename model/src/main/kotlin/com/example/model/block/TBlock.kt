@@ -1,5 +1,7 @@
 package com.example.model.block
 
+import com.example.model.EMPTY_PAYLOAD
+
 data class TBlock(
     val number: Long,
     val parentHash: String,
@@ -20,10 +22,10 @@ data class SendTBlock(
     val owner: String,
     val linker: String,
     val type: String,
-    val hub: Array<String>? = emptyArray(),
+    val hub: List<String>? = emptyList(),
     val code: String? = null,
     val codeHash: String? = null,
-    val payload: String? = "0x00",
+    val payload: String? = EMPTY_PAYLOAD,
     val amount: Long = 0,
     val income: Long? = null,
     val joule: Long = 0,
