@@ -60,6 +60,13 @@ class LatticeTest {
     private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(HTTP_URL)))
 
     @Test
+    fun `get receipt`() {
+        val hash = "0x2cd86e6dae50c67c36430072265d7d93ac67e9b1482772f406f0114bd8db2637"
+        val receipt = httpApi.getReceipt(Constants.CHAIN_ID, hash)
+        println(gson.toJson(receipt))
+    }
+
+    @Test
     fun `get balance`() {
         val balance = httpApi.getBalanceWithPending(Constants.CHAIN_ID, Address(ACCOUNT_ADDRESS_STR))
         println(gson.toJson(balance))

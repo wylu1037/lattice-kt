@@ -75,7 +75,7 @@ data class Receipt(
 data class Event(
     val address: String,
     val topics: Array<String>,
-    val data: ByteArray,
+    val data: String,
     val logIndex: UInt,
     val tblockHash: String,
     val dblockNumber: ULong,
@@ -86,7 +86,7 @@ data class Event(
         return Event(
             address = address,
             topics = topics.copyOf(), // Deep copy Array<String>
-            data = data.copyOf(), // Deep copy ByteArray
+            data = data,
             logIndex = logIndex,
             tblockHash = tblockHash,
             dblockNumber = dblockNumber,
