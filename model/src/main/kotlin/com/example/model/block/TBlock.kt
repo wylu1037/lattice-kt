@@ -14,6 +14,7 @@ fun TBlock.toCurrentTDBlock() = CurrentTDBlock(
     number
 )
 
+@Suppress("ArrayInDataClass")
 data class SendTBlock(
     val number: Long,
     val parentHash: String,
@@ -22,7 +23,7 @@ data class SendTBlock(
     val owner: String,
     val linker: String,
     val type: String,
-    val hub: List<String>? = emptyList(),
+    val hub: Array<String>? = emptyArray(),
     val code: String? = null,
     val codeHash: String? = null,
     val payload: String? = EMPTY_PAYLOAD,

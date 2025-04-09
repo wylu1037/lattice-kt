@@ -14,18 +14,50 @@ package com.example.model.block
  * @property tblockHash 交易区块哈希
  * @property confirmTime 确认时间
  */
+@Suppress("ArrayInDataClass")
 data class Receipt(
     val contractAddress: String,
     var contractRet: String,
     val dblockHash: String,
     val dblockNumber: Int,
-    val events: List<Event>,
+    val events: Array<Event>? = emptyArray(),
     val jouleUsed: Long,
     val receiptIndex: Int,
     val success: Boolean,
     var tblockHash: String,
     var confirmTime: Long
-)
+) {
+
+    fun shallowClone(): Receipt {
+        return Receipt(
+            contractAddress = contractAddress,
+            contractRet = contractRet,
+            dblockHash = dblockHash,
+            dblockNumber = dblockNumber,
+            events = events, // Reference copy (shallow)
+            jouleUsed = jouleUsed,
+            receiptIndex = receiptIndex,
+            success = success,
+            tblockHash = tblockHash,
+            confirmTime = confirmTime
+        )
+    }
+
+    fun deepClone(): Receipt {
+        return Receipt(
+            contractAddress = contractAddress,
+            contractRet = contractRet,
+            dblockHash = dblockHash,
+            dblockNumber = dblockNumber,
+            events = events?.map { it.deepClone() }?.toTypedArray(), // Deep copy each Event
+            jouleUsed = jouleUsed,
+            receiptIndex = receiptIndex,
+            success = success,
+            tblockHash = tblockHash,
+            confirmTime = confirmTime
+        )
+    }
+}
 
 /**
  * 事件
@@ -39,9 +71,10 @@ data class Receipt(
  * @property removed 是否移除
  * @property dataHex 事件数据的16进制字符串
  */
+@Suppress("ArrayInDataClass")
 data class Event(
     val address: String,
-    val topics: List<String>,
+    val topics: Array<String>,
     val data: ByteArray,
     val logIndex: UInt,
     val tblockHash: String,
@@ -49,33 +82,16 @@ data class Event(
     val removed: Boolean,
     val dataHex: String
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Event
-
-        if (removed != other.removed) return false
-        if (address != other.address) return false
-        if (topics != other.topics) return false
-        if (!data.contentEquals(other.data)) return false
-        if (logIndex != other.logIndex) return false
-        if (tblockHash != other.tblockHash) return false
-        if (dblockNumber != other.dblockNumber) return false
-        if (dataHex != other.dataHex) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = removed.hashCode()
-        result = 31 * result + address.hashCode()
-        result = 31 * result + topics.hashCode()
-        result = 31 * result + data.contentHashCode()
-        result = 31 * result + logIndex.hashCode()
-        result = 31 * result + tblockHash.hashCode()
-        result = 31 * result + dblockNumber.hashCode()
-        result = 31 * result + dataHex.hashCode()
-        return result
+    fun deepClone(): Event {
+        return Event(
+            address = address,
+            topics = topics.copyOf(), // Deep copy Array<String>
+            data = data.copyOf(), // Deep copy ByteArray
+            logIndex = logIndex,
+            tblockHash = tblockHash,
+            dblockNumber = dblockNumber,
+            removed = removed,
+            dataHex = dataHex
+        )
     }
 }
