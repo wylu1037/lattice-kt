@@ -3,6 +3,8 @@ package com.example.lattice
 import com.example.abi.LatticeAbi
 import com.example.abi.encode
 import com.example.abi.getFunction
+import com.example.crypto.extension.toECKeyPair
+import com.example.crypto.getCompressedPublicKey
 import com.example.lattice.model.TxVersionEnum
 import com.example.lattice.model.calculateTransactionHash
 import com.example.lattice.model.sign
@@ -12,13 +14,17 @@ import com.example.lattice.provider.HttpApiImpl
 import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
 import com.example.model.Address
+import com.example.model.PrivateKey
 import com.example.model.block.SendTBlock
 import com.example.model.toHex
+import com.example.model.toRSHex
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import org.komputing.khex.extensions.toNoPrefixHexString
+import org.komputing.khex.model.HexString
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -36,8 +42,15 @@ class GenerateTransactionsTest {
     )
 
     private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(Constants.HTTP_URL)))
+    private val compressedPublicKey =
+        PrivateKey(HexString(Constants.PRIVATE_KEY))
+            .toECKeyPair(Constants.CURVE == Curve.Sm2p256v1)
+            .getCompressedPublicKey(Constants.CURVE == Curve.Sm2p256v1)
+            .toNoPrefixHexString()
+
 
     object Constants {
+        internal val TX_VERSION = TxVersionEnum.V_3_0
         internal val CURVE = Curve.Sm2p256v1
         internal const val CHAIN_ID = "2"
         internal const val HTTP_URL = "http://192.168.2.244:40316"
@@ -54,6 +67,7 @@ class GenerateTransactionsTest {
         internal const val CONTRACT_ABI =
             "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"str\",\"type\":\"string\"}],\"name\":\"save\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"hash\",\"type\":\"bytes32\"}],\"name\":\"read\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"strMap\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
     }
+
 
     @Test
     fun `test encode save function`() {
@@ -98,7 +112,7 @@ class GenerateTransactionsTest {
                                 .setOwner(Address(account))
                                 .setLinker(Address(contractAddress))
                                 .setCode(code)
-                                .setVersion(TxVersionEnum.V_3_0)
+                                .setVersion(Constants.TX_VERSION)
                                 .build()
 
                             val (_, signature) = tx.sign(
@@ -106,7 +120,13 @@ class GenerateTransactionsTest {
                                 Constants.CURVE == Curve.Sm2p256v1,
                                 Constants.CHAIN_ID.toInt()
                             )
-                            tx.sign = signature.toHex()
+                            tx.sign = when {
+                                Constants.TX_VERSION === TxVersionEnum.V_3_0 ->
+                                    "${signature.toRSHex()}$compressedPublicKey"
+
+                                else ->
+                                    signature.toHex()
+                            }
 
                             val hash =
                                 tx.calculateTransactionHash(CHAIN_ID.toLong(), Constants.CURVE == Curve.Sm2p256v1)
@@ -158,7 +178,7 @@ class GenerateTransactionsTest {
                                 .setOwner(Address(account))
                                 .setLinker(Address(Constants.COUNTER_ADDRESS))
                                 .setCode(code)
-                                .setVersion(TxVersionEnum.V_3_0)
+                                .setVersion(Constants.TX_VERSION)
                                 .build()
 
                             val (_, signature) = tx.sign(
@@ -166,7 +186,15 @@ class GenerateTransactionsTest {
                                 Constants.CURVE == Curve.Sm2p256v1,
                                 Constants.CHAIN_ID.toInt()
                             )
-                            tx.sign = signature.toHex()
+
+                            tx.sign = when {
+                                Constants.TX_VERSION === TxVersionEnum.V_3_0 ->
+                                    "${signature.toRSHex()}$compressedPublicKey"
+
+                                else ->
+                                    signature.toHex()
+                            }
+
 
                             val hash = tx.calculateTransactionHash(
                                 Constants.CHAIN_ID.toLong(),
