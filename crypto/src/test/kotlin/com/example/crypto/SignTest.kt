@@ -3,12 +3,15 @@ package com.example.crypto
 import com.example.crypto.extension.toECKeyPair
 import com.example.model.PrivateKey
 import com.example.model.SignatureData
+import com.example.model.extension.hash
 import com.example.model.extension.toHexString
+import com.example.model.extension.toHexStringZeroPadded
 import com.example.model.toAddress
 import com.example.model.toEthereumAddress
 import com.example.model.toHex
 import org.junit.Test
 import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.extensions.toNoPrefixHexString
 import org.komputing.khex.model.HexString
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -42,10 +45,22 @@ class SignTest {
     @Test
     fun `sign and verify for sm2p256v1`() {
         val isGM = true
-        val priKeyHex = "0xb58ee7d18f8ea223e8f4ca11cd813d3122990a354355f7b25f4891aa1be0ff2b"
-        val message = HexString("0102030405060708010203040506070801020304050607080102030405060708").hexToByteArray()
+        val priKeyHex = "0xa6de98be23f726db5345ebdc9fe1096193c84ad4750203c8826181a8d8f76c56"
+        val message =
+            HexString("0x7148648be39da5466cadbcf93c8d99a6385122e698164f1a8733d5c164eb5734").hexToByteArray().hash(isGM)
         val keypair = PrivateKey(HexString(priKeyHex)).toECKeyPair(isGM)
+
         val signature = keypair.signMessage(message, isGM)
+        val publicKey = keypair.getCompressedPublicKey(isGM).toNoPrefixHexString()
+        println("publicKey: $publicKey")
+        println(
+            "signature: 0x${signature.r.toHexStringZeroPadded(64, false)}${
+                signature.s.toHexStringZeroPadded(
+                    64,
+                    false
+                )
+            }$publicKey"
+        )
         val result = keypair.publicKey.verifySignature(message, signature, isGM)
         assertTrue(result)
     }
@@ -53,11 +68,12 @@ class SignTest {
     @Test
     fun `verify for sm2p256v1`() {
         val isGM = true
-        val privateKey = "0x29d63245990076b0bbb33f7482beef21855a8d2197c8d076c2356c49e2a06322"
-        val message = HexString("0102030405060708010203040506070801020304050607080102030405060708").hexToByteArray()
+        val privateKey = "0xa6de98be23f726db5345ebdc9fe1096193c84ad4750203c8826181a8d8f76c56"
+        val message =
+            HexString("0x7148648be39da5466cadbcf93c8d99a6385122e698164f1a8733d5c164eb5734").hexToByteArray().hash(isGM)
         val keypair = PrivateKey(HexString(privateKey)).toECKeyPair(isGM)
         val signature =
-            "0xa812ac845156ad2eab7756db7fbe61c49a6d719ee7e60ea60397af5895f0d569480be6f9b7b2ef6e40a8bee3c543f3118d71b02dcebec2893c1527cd7ada4849016d6fccf8d952706dcc2c2b5df560466dcd65a43c47965fca67be5121bc1b16ab"
+            "0x01ab74136da660e4f8c9fc071da81ceaa528429b6c416f66e28a108ab1a277a241495dbe14aa9a9033fd58a6c700d67340a2698720dacc5475d62f162d9dfcfb00"
         val pass = keypair.publicKey.verifySignature(message, SignatureData.fromHexString(signature), isGM)
         assertTrue(pass)
     }

@@ -42,4 +42,6 @@ fun SignatureData.toHex(prefix: String = HEX_PREFIX) = if (e != BigInteger.ZERO)
     prefix + r.to64Hex() + s.to64Hex() + v.toHexStringZeroPadded(2, false)
 }
 
+fun SignatureData.toRSHex(prefix: String = HEX_PREFIX) = prefix + r.to64Hex() + s.to64Hex()
+
 private fun BigInteger.to64Hex() = toHexStringZeroPadded(64, false)

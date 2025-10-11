@@ -12,7 +12,7 @@ fun ByteArray.hash(gm: Boolean = true): ByteArray {
         val out = ByteArray(digest.digestSize)
         digest.doFinal(out, 0)
         out
-    } else{
+    } else {
         this.sha256()
     }
 }

@@ -4,9 +4,12 @@ import com.example.abi.LatticeAbi
 import com.example.abi.decodeReturn
 import com.example.abi.encode
 import com.example.abi.getFunction
+import com.example.crypto.extension.toECKeyPair
+import com.example.crypto.getCompressedPublicKey
 import com.example.lattice.GenerateTransactionsTest.Constants
 import com.example.lattice.model.Transaction
 import com.example.lattice.model.TxTypeEnum
+import com.example.lattice.model.TxVersionEnum
 import com.example.lattice.model.calculateTransactionHash
 import com.example.lattice.model.sign
 import com.example.lattice.model.toSendTBlock
@@ -16,11 +19,13 @@ import com.example.lattice.provider.HttpApiParams
 import com.example.lattice.provider.URL
 import com.example.model.Address
 import com.example.model.EthereumAddress
+import com.example.model.PrivateKey
 import com.example.model.extension.toBytes32Array
 import com.example.model.extension.toHexString
 import com.example.model.toAddress
 import com.example.model.toEthereumAddress
 import com.example.model.toHex
+import com.example.model.toRSHex
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,24 +34,26 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import org.komputing.khex.extensions.toNoPrefixHexString
+import org.komputing.khex.model.HexString
 import java.io.File
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal const val ACCOUNT_ADDRESS_STR = "zltc_dS73XWcJqu2uEk4cfWsX8DDhpb9xsaH9s"
+internal const val ACCOUNT_ADDRESS_STR = "zltc_ZiEMa2ziV7R9v3uqamvKA9ubmiRpz8B8g"
 internal const val LINKER_ADDRESS_STR = "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD"
-internal const val PRIVATE_KEY_HEX = "0xdbd91293f324e5e49f040188720c6c9ae7e6cc2b4c5274120ee25808e8f4b6a7"
+internal const val PRIVATE_KEY_HEX = "0xa6de98be23f726db5345ebdc9fe1096193c84ad4750203c8826181a8d8f76c56"
 internal const val IS_GM = true
-internal const val CHAIN_ID = 1
-internal const val HTTP_URL = "http://192.168.3.51:13000"
+internal const val CHAIN_ID = 2
+internal const val HTTP_URL = "http://192.168.2.244:40316"
 
 internal val lattice = LatticeImpl(
-    ChainConfig(chainId = 1, curve = Curve.Sm2p256v1, tokenLess = true),
+    ChainConfig(chainId = CHAIN_ID, curve = Curve.Sm2p256v1, tokenLess = true),
     ConnectingNodeConfig(HTTP_URL),
     CredentialConfig(
-        accountAddress = "zltc_j5yLhxm8fkwJkuhapqmqmJ1vYY2gLfPLy",
-        privateKey = "0x88d80c38a8a10e03b54c2c2234e90d9809030a78e4fd2f99a6a189629b530f90"
+        accountAddress = ACCOUNT_ADDRESS_STR,
+        privateKey = PRIVATE_KEY_HEX
     ),
     newAccountLock(),
     BlockCacheImpl()
@@ -58,6 +65,8 @@ internal const val LEDGER_ABI =
 class LatticeTest {
 
     private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(HTTP_URL)))
+    private val compressedPublicKey =
+        PrivateKey(HexString(PRIVATE_KEY_HEX)).toECKeyPair(IS_GM).getCompressedPublicKey(IS_GM).toNoPrefixHexString()
 
     @Test
     fun `get receipt`() {
@@ -78,9 +87,9 @@ class LatticeTest {
         val payload = "0x01"
         runBlocking {
             val jobs = mutableListOf<Job>()
-            for (i in 1..10000) {
+            for (i in 1..100) {
                 val job = launch(Dispatchers.Default) {
-                    lattice.transfer(CHAIN_ID.toString(), linker, payload)
+                    lattice.transfer(CHAIN_ID.toString(), linker, payload, 0, 0, TxVersionEnum.V_3_0)
                 }
                 jobs.add(job)
             }
@@ -90,7 +99,9 @@ class LatticeTest {
 
     @Test
     fun `transfer wait receipt`() {
-        val receipt = lattice.transferWaitReceipt(CHAIN_ID.toString(), "zltc_nbrZcx1AzBXC361nWSwry8JgSJNEzrNiD", "0x01")
+        val receipt = lattice.transferWaitReceipt(
+            CHAIN_ID.toString(), "zltc_S5KXbs6gFkEpSnfNpBg3DvZHnB9aasa6Q", "0x01", 0, 0, TxVersionEnum.V_3_0
+        )
         assertNotNull(receipt)
     }
 
@@ -129,17 +140,18 @@ class LatticeTest {
         if (!file.exists()) file.createNewFile()
 
         file.printWriter().use { out ->
-            for (i in 1..10000) {
+            for (i in 1..10) {
                 val tx = TransferTXBuilder.builder()
                     .setBlock(latestTBlock)
                     .setPayload("0x01")
                     .setOwner(Address(ACCOUNT_ADDRESS_STR))
                     .setLinker(Address(LINKER_ADDRESS_STR))
+                    .setVersion(TxVersionEnum.V_3_0)
                     .build()
                 val (_, signature) = tx.sign(PRIVATE_KEY_HEX, IS_GM, CHAIN_ID)
-                tx.sign = signature.toHex()
+                tx.sign = signature.toRSHex() + compressedPublicKey
 
-                val hash = tx.calculateTransactionHash()
+                val hash = tx.calculateTransactionHash(CHAIN_ID.toLong(), IS_GM)
 
                 latestTBlock.currentTBlockHash = hash
                 latestTBlock.currentTBlockNumber = tx.number
@@ -176,12 +188,13 @@ class LatticeTest {
                                 .setPayload("0x01")
                                 .setOwner(Address(ACCOUNT_ADDRESS_STR))
                                 .setLinker(Address(LINKER_ADDRESS_STR))
+                                .setVersion(TxVersionEnum.V_3_0)
                                 .build()
 
                             val (_, signature) = tx.sign(privateKeys[index], IS_GM, CHAIN_ID)
                             tx.sign = signature.toHex()
 
-                            val hash = tx.calculateTransactionHash()
+                            val hash = tx.calculateTransactionHash(CHAIN_ID.toLong(), IS_GM)
 
                             latestTBlock.currentTBlockHash = hash
                             latestTBlock.currentTBlockNumber = tx.number

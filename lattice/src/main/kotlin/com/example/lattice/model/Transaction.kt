@@ -40,6 +40,7 @@ import java.time.Instant
  * @property version 交易版本 [TxVersionEnum]
  * @property difficulty 难度
  */
+@Suppress("ArrayInDataClass")
 data class Transaction(
     var number: Long,
     var parentHash: String,
@@ -57,7 +58,7 @@ data class Transaction(
     var joule: Long = 0,
     var sign: String? = null,
     var proofOfWork: String? = null,
-    var version: Int = TxVersionEnum.LATEST.version(),
+    var version: Int = TxVersionEnum.TAIYI.version(),
     var difficulty: Int? = 0
 )
 
@@ -122,6 +123,7 @@ fun Transaction.getPow(codeHash: String, chainId: Int, isGM: Boolean = true): St
     }
 }
 
+@Suppress("DuplicatedCode")
 fun Transaction.hashSeal(
     codeHash: String,
     pow: String,
@@ -131,29 +133,58 @@ fun Transaction.hashSeal(
     isSign: Boolean = false
 ): ByteArray {
     val raw = mutableListOf<Any>()
-    raw.add(number.toByteArray())
-    raw.add(type.hex)
-    raw.add(parentHash)
-    raw.add(hub)
-    raw.add(daemonHash)
-    raw.add(codeHash)
-    raw.add(owner.toEthereumAddress())
-    raw.add(linker!!.toEthereumAddress())
-    raw.add(amount.toByteArray())
-    raw.add(joule.toByteArray())
-    if (useProofOfWork) {
-        raw.add(pow)
-    } else {
-        raw.add(DIFFICULTY_BYTE_ARRAY)
-        raw.add(POW_BYTE_ARRAY)
+
+    when (version) {
+        // CHAOS、PANGU、NUWA、TAIYI
+        in 0..3 -> {
+            raw.add(number.toByteArray())
+            raw.add(type.hex)
+            raw.add(parentHash)
+            raw.add(hub)
+            raw.add(daemonHash)
+            raw.add(codeHash)
+            raw.add(owner.toEthereumAddress())
+            raw.add(linker!!.toEthereumAddress())
+            raw.add(amount.toByteArray())
+            raw.add(joule.toByteArray())
+            if (useProofOfWork) {
+                raw.add(pow)
+            } else {
+                raw.add(DIFFICULTY_BYTE_ARRAY)
+                raw.add(POW_BYTE_ARRAY)
+            }
+            raw.add(payload ?: HEX_PREFIX)
+            raw.add(timestamp.toByteArray())
+            raw.add((chainId.toLong()).toByteArray())
+            if (isSign) {
+                raw.add(HEX_PREFIX)
+                raw.add(HEX_PREFIX)
+            }
+        }
+        // V_3_0
+        4 -> {
+            raw.add((chainId.toLong()).toByteArray())
+            raw.add(number.toByteArray())
+            raw.add(joule.toByteArray())
+            raw.add(timestamp.toByteArray())
+            //raw.add(type.hex)
+            raw.add(type.newHex)
+            raw.add(1L.toByteArray()) // version
+            raw.add(parentHash)
+            raw.add(daemonHash)
+            raw.add(codeHash)
+            raw.add(owner.toEthereumAddress())
+            raw.add(linker!!.toEthereumAddress())
+            raw.add(amount.toByteArray())
+            raw.add(income ?: 0L.toByteArray())
+            raw.add(payload ?: HEX_PREFIX)
+            raw.add(byteArrayOf())
+            raw.add(hub)
+        }
+
+        else -> throw IllegalArgumentException("不支持的交易版本: $version")
     }
-    raw.add(payload ?: HEX_PREFIX)
-    raw.add(timestamp.toByteArray())
-    raw.add((chainId.toLong()).toByteArray())
-    if (isSign) {
-        raw.add(HEX_PREFIX)
-        raw.add(HEX_PREFIX)
-    }
+
     val rlp = RLPList(
         raw.map {
             when (it) {
@@ -164,7 +195,9 @@ fun Transaction.hashSeal(
             }
         }
     ).encode()
-    return rlp.hash(isGM)
+    return rlp.hash(isGM).let { h ->
+        if (version >= TxVersionEnum.V_3_0.version()) h.hash(isGM) else h
+    }
 }
 
 /**
@@ -196,52 +229,81 @@ fun Transaction.toSendTBlock() = SendTBlock(
 /**
  * calculate transaction hash
  *
+ * @param chainId blockchain id
  * @param isGM sm2p256v1 or secp256k1
  * @param useProofOfWork default false
  * @return transaction hash
  */
-fun Transaction.calculateTransactionHash(isGM: Boolean = true, useProofOfWork: Boolean = false): String {
+@Suppress("DuplicatedCode")
+fun Transaction.calculateTransactionHash(chainId: Long, isGM: Boolean = true, useProofOfWork: Boolean = false): String {
     val raw = mutableListOf<Any>()
-    raw.add(number.toByteArray())
-    raw.add(type.hex)
-    raw.add(parentHash)
-    raw.add(daemonHash)
 
-    val codeHash = if (codeHash.isNullOrBlank()) {
-        if (code.isNullOrBlank()) ZERO_HASH else HexString(code!!).hash(isGM).toHexString()
-    } else {
-        codeHash
-    }
-    raw.add(codeHash)
+    when (version) {
+        // CHAOS、PANGU、NUWA、TAIYI
+        in 0..3 -> {
+            raw.add(number.toByteArray())
+            raw.add(type.hex)
+            raw.add(parentHash)
+            raw.add(daemonHash)
 
-    raw.add(owner.toEthereumAddress())
-    raw.add(linker!!.toEthereumAddress())
-    raw.add(hub)
-    raw.add(amount.toByteArray())
-    raw.add((income ?: 0).toByteArray())
-    raw.add(joule.toByteArray())
+            val codeHash = if (codeHash.isNullOrBlank()) {
+                if (code.isNullOrBlank()) ZERO_HASH else HexString(code!!).hash(isGM).toHexString()
+            } else {
+                codeHash
+            }
+            raw.add(codeHash)
 
-    if (useProofOfWork) {
-        raw.add("0x00")
-    } else {
-        raw.add(DIFFICULTY_BYTE_ARRAY)
-        raw.add(POW_BYTE_ARRAY)
-    }
+            raw.add(owner.toEthereumAddress())
+            raw.add(linker!!.toEthereumAddress())
+            raw.add(hub)
+            raw.add(amount.toByteArray())
+            raw.add((income ?: 0).toByteArray())
+            raw.add(joule.toByteArray())
 
-    raw.add(payload ?: HEX_PREFIX)
+            if (useProofOfWork) {
+                raw.add("0x00")
+            } else {
+                raw.add(DIFFICULTY_BYTE_ARRAY)
+                raw.add(POW_BYTE_ARRAY)
+            }
 
-    raw.add(timestamp.toByteArray())
-    raw.add(sign!!) // 1.4的链需要
+            raw.add(payload ?: HEX_PREFIX)
 
-    // 1.4的链不需要以下部分了
-    /*val signature = SignatureData.fromHex(sign!!.replace("0x", ""))
-    raw.add(signature.e)
-    raw.add(signature.v.add(BigInteger.valueOf(chainId).multiply(BigInteger.valueOf(2))))
-    raw.add(signature.r)
-    raw.add(signature.s)*/
+            raw.add(timestamp.toByteArray())
+            raw.add(sign!!) // 1.4的链需要
 
-    if (version > 1) {
-        raw.add(version.toLong().toByteArray())
+            // 1.4的链不需要以下部分了
+            /*val signature = SignatureData.fromHex(sign!!.replace("0x", ""))
+            raw.add(signature.e)
+            raw.add(signature.v.add(BigInteger.valueOf(chainId).multiply(BigInteger.valueOf(2))))
+            raw.add(signature.r)
+            raw.add(signature.s)*/
+
+            if (version > 1) {
+                raw.add(version.toLong().toByteArray())
+            }
+        }
+        // V_3_0
+        4 -> {
+            raw.add(chainId.toByteArray())
+            raw.add(number.toByteArray())
+            raw.add(joule.toByteArray())
+            raw.add(timestamp.toByteArray())
+            raw.add(type.newHex)
+            raw.add(1L.toByteArray()) // version
+            raw.add(parentHash)
+            raw.add(daemonHash)
+            raw.add(codeHash ?: ZERO_HASH)
+            raw.add(owner.toEthereumAddress())
+            raw.add(linker!!.toEthereumAddress())
+            raw.add(amount.toByteArray())
+            raw.add(income ?: 0L.toByteArray())
+            raw.add(payload ?: HEX_PREFIX)
+            raw.add(byteArrayOf())
+            raw.add(Array(0) { ByteArray(32) }) // []common.Hash{}
+        }
+
+        else -> throw IllegalArgumentException("不支持的交易版本: $version")
     }
 
     val rlp = RLPList(

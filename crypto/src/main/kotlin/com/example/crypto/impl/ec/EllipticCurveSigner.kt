@@ -3,7 +3,11 @@ package com.example.crypto.impl.ec
 import com.example.crypto.api.ec.Signer
 import com.example.model.PUBLIC_KEY_SIZE
 import com.example.model.SignatureData
-import com.example.model.extension.*
+import com.example.model.extension.hash
+import com.example.model.extension.toBigInteger
+import com.example.model.extension.toBytesPadded
+import com.example.model.extension.toHexStringNoPrefix
+import com.example.model.extension.toHexStringZeroPadded
 import org.bouncycastle.asn1.x9.X9IntegerConverter
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
@@ -146,7 +150,7 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
 
         return if (curveName == sm2p256v1) {
             val signer = SM2Signer()
-            publicKeyArray[0] = 4
+            publicKeyArray[0] = 4 // Marked as uncompressed public key
             val publicKeyWithPrefix = BigInteger(1, Arrays.copyOfRange(publicKeyArray, 0, publicKeyArray.size))
             val publicKeyParameters =
                 ECPublicKeyParameters(domainParams.curve.decodePoint(publicKeyWithPrefix.toByteArray()), domainParams)
@@ -156,7 +160,7 @@ class EllipticCurveSigner(private val curveName: String) : Signer {
             signer.verifySignature(sig)
         } else {
             val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-            publicKeyArray[0] = 4
+            publicKeyArray[0] = 4 // Marked as uncompressed public key
             publicKeyArray.let {
                 val publicKeyParameters =
                     ECPublicKeyParameters(domainParams.curve.decodePoint(it), domainParams)

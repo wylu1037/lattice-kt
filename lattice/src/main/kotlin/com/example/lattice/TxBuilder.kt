@@ -2,6 +2,8 @@ package com.example.lattice
 
 import com.example.lattice.model.Transaction
 import com.example.lattice.model.TxTypeEnum
+import com.example.lattice.model.TxVersionEnum
+import com.example.lattice.model.version
 import com.example.model.Address
 import com.example.model.block.CurrentTDBlock
 import java.time.Instant
@@ -26,6 +28,8 @@ interface TransactionBuilder<T : TransactionBuilder<T>> {
     fun setAmount(amount: Long): T
 
     fun setJoule(joule: Long): T
+
+    fun setVersion(version: TxVersionEnum): T
 
     fun refreshTimestamp(): T
 }
@@ -79,6 +83,11 @@ abstract class BaseTransactionBuilder<T : BaseTransactionBuilder<T>>(type: TxTyp
 
     override fun setJoule(joule: Long): T {
         tx.joule = joule
+        return self()
+    }
+
+    override fun setVersion(version: TxVersionEnum): T {
+        tx.version = version.version()
         return self()
     }
 

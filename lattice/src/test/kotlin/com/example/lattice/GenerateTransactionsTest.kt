@@ -3,6 +3,7 @@ package com.example.lattice
 import com.example.abi.LatticeAbi
 import com.example.abi.encode
 import com.example.abi.getFunction
+import com.example.lattice.model.TxVersionEnum
 import com.example.lattice.model.calculateTransactionHash
 import com.example.lattice.model.sign
 import com.example.lattice.model.toSendTBlock
@@ -37,9 +38,9 @@ class GenerateTransactionsTest {
     private val httpApi: HttpApi = HttpApiImpl(HttpApiParams(URL(Constants.HTTP_URL)))
 
     object Constants {
-        internal const val IS_GM = true
-        internal const val CHAIN_ID = "1"
-        internal const val HTTP_URL = "http://192.168.2.40:13000"
+        internal val CURVE = Curve.Sm2p256v1
+        internal const val CHAIN_ID = "2"
+        internal const val HTTP_URL = "http://192.168.2.244:40316"
         internal const val ACCOUNT_ADDRESS = "zltc_mAsC8VzKGmumYGGAeqn9dz5pTohVTgpTk"
         internal const val PRIVATE_KEY = "0x2cd1ae6e78e8c9b3232477db66559c8b796fdf5419930708ee581ee4a708f826"
 
@@ -97,16 +98,18 @@ class GenerateTransactionsTest {
                                 .setOwner(Address(account))
                                 .setLinker(Address(contractAddress))
                                 .setCode(code)
+                                .setVersion(TxVersionEnum.V_3_0)
                                 .build()
 
                             val (_, signature) = tx.sign(
                                 privateKeys[index],
-                                Constants.IS_GM,
+                                Constants.CURVE == Curve.Sm2p256v1,
                                 Constants.CHAIN_ID.toInt()
                             )
                             tx.sign = signature.toHex()
 
-                            val hash = tx.calculateTransactionHash()
+                            val hash =
+                                tx.calculateTransactionHash(CHAIN_ID.toLong(), Constants.CURVE == Curve.Sm2p256v1)
 
                             // update daemon block hash
                             resetDaemonBlockHashIdx++
@@ -155,16 +158,20 @@ class GenerateTransactionsTest {
                                 .setOwner(Address(account))
                                 .setLinker(Address(Constants.COUNTER_ADDRESS))
                                 .setCode(code)
+                                .setVersion(TxVersionEnum.V_3_0)
                                 .build()
 
                             val (_, signature) = tx.sign(
                                 privateKeys[index],
-                                Constants.IS_GM,
+                                Constants.CURVE == Curve.Sm2p256v1,
                                 Constants.CHAIN_ID.toInt()
                             )
                             tx.sign = signature.toHex()
 
-                            val hash = tx.calculateTransactionHash()
+                            val hash = tx.calculateTransactionHash(
+                                Constants.CHAIN_ID.toLong(),
+                                Constants.CURVE == Curve.Sm2p256v1,
+                            )
 
                             // update daemon block hash
                             resetDaemonBlockHashIdx++
