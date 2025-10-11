@@ -51,7 +51,7 @@ data class Transaction(
     val type: TxTypeEnum,
     var hub: Array<String> = emptyArray(),
     var code: String? = null,
-    val codeHash: String? = null,
+    var codeHash: String = "",
     var payload: String? = "0x",
     var amount: Long = 0,
     var income: Long? = null,
@@ -93,14 +93,13 @@ fun Transaction.sign(
  */
 fun Transaction.hash(isGM: Boolean = true, chainId: Int = 1, useProofOfWork: Boolean = false): Pair<String, ByteArray> {
     val codeHash = if (!code.isNullOrBlank()) {
-        if (codeHash.isNullOrBlank()) {
+        codeHash.ifBlank {
             HexString(code!!).hash(isGM).toHexString()
-        } else {
-            codeHash
         }
     } else {
         ZERO_HASH
     }
+    this.codeHash = codeHash
     if (payload.isNullOrBlank()) payload = "0x"
     linker = linker ?: Address(ZERO_LTC_ADDR)
 
@@ -237,6 +236,9 @@ fun Transaction.toSendTBlock() = SendTBlock(
 @Suppress("DuplicatedCode")
 fun Transaction.calculateTransactionHash(chainId: Long, isGM: Boolean = true, useProofOfWork: Boolean = false): String {
     val raw = mutableListOf<Any>()
+    val codeHash = codeHash.ifBlank {
+        if (code.isNullOrBlank()) ZERO_HASH else HexString(code!!).hash(isGM).toHexString()
+    }
 
     when (version) {
         // CHAOS、PANGU、NUWA、TAIYI
@@ -245,14 +247,7 @@ fun Transaction.calculateTransactionHash(chainId: Long, isGM: Boolean = true, us
             raw.add(type.hex)
             raw.add(parentHash)
             raw.add(daemonHash)
-
-            val codeHash = if (codeHash.isNullOrBlank()) {
-                if (code.isNullOrBlank()) ZERO_HASH else HexString(code!!).hash(isGM).toHexString()
-            } else {
-                codeHash
-            }
             raw.add(codeHash)
-
             raw.add(owner.toEthereumAddress())
             raw.add(linker!!.toEthereumAddress())
             raw.add(hub)
@@ -293,7 +288,7 @@ fun Transaction.calculateTransactionHash(chainId: Long, isGM: Boolean = true, us
             raw.add(1L.toByteArray()) // version
             raw.add(parentHash)
             raw.add(daemonHash)
-            raw.add(codeHash ?: ZERO_HASH)
+            raw.add(codeHash)
             raw.add(owner.toEthereumAddress())
             raw.add(linker!!.toEthereumAddress())
             raw.add(amount.toByteArray())
