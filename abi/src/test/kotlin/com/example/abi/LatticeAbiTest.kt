@@ -1,6 +1,6 @@
 package com.example.abi
 
-import junit.framework.TestCase.assertEquals
+import kotlin.test.assertEquals
 import kotlin.test.Test
 
 
@@ -62,7 +62,7 @@ class LatticeAbiTest {
             "0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000561717f7922a233720ae38acaa4174cda0bf17660000000000000000000000000000000000000000000000000000000000000042307835313634383262323838303732313134396637356339616561336236613661373030303232633738353631663665323266626430643466373365356537343332000000000000000000000000000000000000000000000000000000000000"
         val abi = ResourceUtils.readFileContent(LEDGER_ABI_FILENAME)
         val code = LatticeAbi(abi).getFunction("setDataSecret").decode(expected)
-        assertEquals(expected, code)
+        assertEquals<Any>(expected, code as Any)
     }
 
     @Test
@@ -133,5 +133,57 @@ class LatticeAbiTest {
             "0x74d379540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013200000000000000000000000000000000000000000000000000000000000000"
         assertEquals(expected, code)
         // 0x74d379540000000000000000000000000000000000000000000000000000000000000001310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013200000000000000000000000000000000000000000000000000000000000000
+    }
+
+    @Test
+    fun `encode createContract`() {
+        val abi =
+            """[{"name":"createContract","type":"function","stateMutability":"view","inputs":[{"name":"args","internalType":"struct Resource.ContractParams","type":"tuple","components":[{"name":"contractId","type":"string","internalType":"string"},{"name":"contractName","type":"string","internalType":"string"},{"name":"contractAbstract","type":"string","internalType":"string"},{"name":"signMode","type":"string","internalType":"string"},{"name":"hasPrivacyCompute","type":"bool","internalType":"bool"},{"name":"activationTime","type":"uint64","internalType":"uint64"},{"name":"endTime","type":"uint64","internalType":"uint64"},{"name":"strategies","internalType":"struct Resource.Strategy[]","type":"tuple[]","components":[{"name":"resourceId","type":"string","internalType":"string"},{"name":"connects","internalType":"struct Resource.ConnectInfo[]","type":"tuple[]","components":[{"name":"connectId","type":"string","internalType":"string"},{"name":"accessType","type":"string","internalType":"string"},{"name":"accessConfig","type":"string","internalType":"string"},{"name":"entity","type":"string","internalType":"string"}]},{"name":"resourceName","type":"string","internalType":"string"},{"name":"Abstract","type":"string","internalType":"string"},{"name":"operation","type":"string","internalType":"string"},{"name":"strategyNodes","internalType":"struct Resource.StrategyNode[]","type":"tuple[]","components":[{"name":"nodeId","type":"string","internalType":"string"},{"name":"nodeName","type":"string","internalType":"string"},{"name":"nodePeerId","type":"string","internalType":"string"},{"name":"strategyType","type":"string","internalType":"string"}]},{"name":"rules","internalType":"struct Resource.Rule[]","type":"tuple[]","components":[{"name":"name","type":"string","internalType":"string"},{"name":"grule","type":"string","internalType":"string"},{"name":"Type","type":"uint8","internalType":"uint8"},{"name":"factJsonString","type":"string","internalType":"string"}]}]},{"name":"code","type":"bytes","internalType":"bytes"}]}],"outputs":[]}]"""
+        val args = arrayOf<Any>(
+            arrayOf<Any>(                       // tuple: ContractParams
+                "contract001",                  // contractId
+                "TestContract",                 // contractName
+                "A test contract",              // contractAbstract
+                "single",                       // signMode
+                true,                           // hasPrivacyCompute
+                1700000000L,                    // activationTime
+                1800000000L,                    // endTime
+                arrayOf<Any>(                   // strategies: Strategy[]
+                    arrayOf<Any>(               // Strategy tuple
+                        "resource001",          // resourceId
+                        arrayOf<Any>(           // connects: ConnectInfo[]
+                            arrayOf<Any>(       // ConnectInfo tuple
+                                "connect001",   // connectId
+                                "http",         // accessType
+                                "{}",           // accessConfig
+                                "entity001"     // entity
+                            )
+                        ),
+                        "ResourceA",            // resourceName
+                        "Resource abstract",    // Abstract
+                        "read",                 // operation
+                        arrayOf<Any>(           // strategyNodes: StrategyNode[]
+                            arrayOf<Any>(       // StrategyNode tuple
+                                "node001",      // nodeId
+                                "NodeA",        // nodeName
+                                "peer001",      // nodePeerId
+                                "default"       // strategyType
+                            )
+                        ),
+                        arrayOf<Any>(           // rules: Rule[]
+                            arrayOf<Any>(       // Rule tuple
+                                "rule001",      // name
+                                "when x > 0 then y = 1", // grule
+                                1,              // Type (uint8)
+                                "{\"key\":\"value\"}" // factJsonString
+                            )
+                        )
+                    )
+                ),
+                "0x6080604052"                  // code (bytes)
+            )
+        )
+        val code = LatticeAbi(abi).getFunction("createContract").encode(args)
+        println(code)
     }
 }

@@ -83,9 +83,13 @@ subprojects {
                 "org.slf4j:slf4j-api",
         )
         testImplementation(
-                "org.jetbrains.kotlin:kotlin-test",
+                "org.jetbrains.kotlin:kotlin-test-junit5",
                 "ch.qos.logback:logback-classic",
         )
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
     }
 
     tasks.shadowJar {
@@ -98,12 +102,4 @@ subprojects {
             exclude(dependency('com.fasterxml.jackson.core:jackson-databind'))
         }
     }
-}
-
-dependencies {
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
-}
-
-test {
-    useJUnitPlatform()
 }

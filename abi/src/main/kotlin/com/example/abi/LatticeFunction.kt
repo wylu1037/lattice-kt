@@ -21,6 +21,7 @@ import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.DynamicArray
+import org.web3j.abi.datatypes.DynamicBytes
 import org.web3j.abi.datatypes.DynamicStruct
 import org.web3j.abi.datatypes.Function
 import org.web3j.abi.datatypes.Type
@@ -355,6 +356,16 @@ fun convertArgument(namedType: EthereumNamedType, arg: Any?): Type<*> {
                 is Byte -> Bool(arg == 1.toByte())
                 else -> throw IllegalArgumentException("Invalid argument type, Bool only supports Boolean, String and Byte")
             }
+        }
+
+        // bytes (dynamic)
+        type == "bytes" -> {
+            val bytes = Hex.decode(
+                (arg as? String
+                    ?: throw IllegalArgumentException("Invalid argument type, bytes needs to be Hex String"))
+                    .removePrefix("0x")
+            )
+            DynamicBytes(bytes)
         }
 
         // bytes1 ~ bytes32
